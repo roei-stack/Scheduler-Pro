@@ -1,0 +1,43 @@
+.home,
+.account,
+.services,
+.sign-up,
+.sign-in,
+.not-found {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.account {
+    background-color: #2d333b;
+}
+
+.sign-in {
+    background-image: url('/public/images/img-7.jpg');
+    /*width: 100;*/
+}
+
+.sign-up {
+    background-image: url('/public/images/img-signup.jpeg');
+}
+
+.services {
+    background-image: url('/public/images/img-services.webp');
+}
+
+.not-found {
+    align-items: baseline;
+    background-image: url('/public/images/img-404.jpeg');
+    font-size: 3.25em;
+}
+
+.not-found small {
+    display: flex;
+    justify-content: center;
+}
