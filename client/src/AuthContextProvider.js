@@ -49,10 +49,10 @@ function AuthContextProvider({ children }) {
   }, [setUsername, setIsSignedIn]);
 
   // handle and change states when user signes in or out
-  const handleSignIn = (username, token) => {
-    notifySuccess(`Welcome, ${username}!`)
-    localStorage.setItem('token', token);
-    setUsername(username);
+  const handleSignIn = data => {
+    notifySuccess(`Welcome, ${data.username}!`)
+    localStorage.setItem('token', data.token);
+    setUsername(data.username);
     setIsSignedIn(true);
     navigate(`/account/${username}`);
   };

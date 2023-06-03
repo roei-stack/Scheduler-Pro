@@ -50,7 +50,7 @@ function Signin() {
       } else {
         throw new Error('An error occurred, please try again later');
       }
-    }).then(data => handleSignIn(username, data.token))
+    }).then(data => handleSignIn(data))
       .catch(error => notifyError(error.message));
   };
 

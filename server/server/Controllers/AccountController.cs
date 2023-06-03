@@ -65,7 +65,7 @@ namespace server.Controllers
                         Expires = tokenExpiration 
                     });
                 }
-                return Ok(new { token = token });
+                return Ok(new { token = token, username = user.Username, isInstitution = user.IsInstitution });
             }
             else
             {
