@@ -16,15 +16,16 @@ function Signup() {
 
   const isMountedRef = useRef(false);
   useEffect(() => {
-    // makes sure the useEffect will only run once
-    if (isMountedRef.current) { return; } else { isMountedRef.current = true; }
-    if (isSignedIn) {
-      handleSignOut();
+    // this check makes sure the useEffect will only run once
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
     }
+    if (isSignedIn) { handleSignOut(); }
     window.scrollTo(0, 0);
     document.title = `Sign Up | ${APP_NAME}`;
     return () => document.title = APP_NAME;
-  }, []);
+  });
 
   const handleSubmit = e => {
     e.preventDefault();

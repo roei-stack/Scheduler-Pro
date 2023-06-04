@@ -7,10 +7,8 @@ function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = `${APP_NAME}: Let's get efficent`;
-    return () => {
-      document.title = APP_NAME;
-    };
-  }, []);
+    return () => document.title = APP_NAME;
+  });
 
   return (
     <>

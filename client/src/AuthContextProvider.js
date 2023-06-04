@@ -17,6 +17,7 @@ const CLAIM_NAMES = {
 // create context for authentication
 export const AuthContext = createContext({
   username: '',
+  isInstitution: null,
   isSignedIn: false,
   handleSignIn: () => { },
   handleSignOut: () => { }
@@ -28,6 +29,7 @@ export const notifyInfo = text => toast.info(text, { position: "bottom-left", th
 
 function AuthContextProvider({ children }) {
   const [username, setUsername] = useState('');
+  const [isInstitution, setIsInstitution] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -40,27 +42,30 @@ function AuthContextProvider({ children }) {
       const isValid = decodedToken.expire ? Date.now() <= decodedToken.expire * 1000 : false;
       if (isValid) {
         setUsername(decodedToken.username);
+        setIsInstitution(decodedToken.isInstitution);
         setIsSignedIn(true);
       } else {
         localStorage.removeItem('token');
       }
     }
     setIsLoading(false);
-  }, [setUsername, setIsSignedIn]);
+  }, [setUsername, setIsInstitution, setIsSignedIn]);
 
   // handle and change states when user signes in or out
   const handleSignIn = data => {
-    notifySuccess(`Welcome, ${data.username}!`)
+    notifySuccess(`Welcome, ${data.username}!`);
     localStorage.setItem('token', data.token);
     setUsername(data.username);
+    setIsInstitution(data.isInstitution);
     setIsSignedIn(true);
-    navigate(`/account/${username}`);
+    navigate(`/account/${data.username}`);
   };
 
   const handleSignOut = () => {
     notifyInfo('You have been signed out');
     localStorage.removeItem('token');
     setUsername('');
+    setIsInstitution(null);
     setIsSignedIn(false);
   };
 
@@ -79,7 +84,7 @@ function AuthContextProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ username, isSignedIn, handleSignIn, handleSignOut }}>
+    <AuthContext.Provider value={{ username, isInstitution, isSignedIn, handleSignIn, handleSignOut }}>
       {/* only render the app once the token has been checked */}
       {!isLoading && children}
       {/* render toast notifications/alerts */}

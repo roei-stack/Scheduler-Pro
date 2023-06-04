@@ -7,8 +7,8 @@ import Services from './components/pages/Services';
 import Signin from './components/pages/Signin';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
-import Account from './components/pages/Account';
 import Footer from './components/Footer';
+import Account from './components/pages/Account';
 import './App.css';
 
 function App() {
