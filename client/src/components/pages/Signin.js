@@ -22,7 +22,7 @@ function Signin() {
     window.scrollTo(0, 0);
     document.title = `Sign In | ${APP_NAME}`;
     return () => document.title = APP_NAME;
-  });
+  }, []);
 
   //todo not two notifications
   const handleSubmit = e => {

@@ -25,7 +25,7 @@ function Signup() {
     window.scrollTo(0, 0);
     document.title = `Sign Up | ${APP_NAME}`;
     return () => document.title = APP_NAME;
-  });
+  }, []);
 
   const handleSubmit = e => {
     e.preventDefault();

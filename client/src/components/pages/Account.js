@@ -18,7 +18,7 @@ function Account() {
     window.scrollTo(0, 0);
     document.title = `${username} | ${APP_NAME}`;
     return () => document.title = APP_NAME;
-  });
+  }, []);
 
   return (
     <>

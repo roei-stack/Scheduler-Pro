@@ -7,7 +7,7 @@ function Services() {
     window.scrollTo(0, 0);
     document.title = `Services | ${APP_NAME}`;
     return () => document.title = APP_NAME;
-  });
+  }, []);
 
   return (
     <h1 className='services'>

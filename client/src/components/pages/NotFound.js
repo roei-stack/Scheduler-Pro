@@ -6,7 +6,7 @@ function NotFound() {
         window.scrollTo(0, 0);
         document.title = `404 Not Found | ${APP_NAME}`;
         return () => document.title = APP_NAME;
-    });
+    }, []);
 
     return (
         <div className='not-found'>
