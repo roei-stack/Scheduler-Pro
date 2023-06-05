@@ -3,14 +3,24 @@ import './InstitutionSetup.css';
 import { Link } from 'react-router-dom';
 import TextGenerate from '../TextGenerate';
 
+let typeWriterPace = 45
+
 function InstitutionSetup() {
     return (
         <section className='account-setup'>
             <div className='blur-box'>
                 <div>
-                    <h1><TextGenerate text='Welcome to Scheduler Pro!' cooldownMilliseconds={1000} durationMilliseconds={1500}/><br /></h1>
-                    <h2><TextGenerate text="Let's get started" cooldownMilliseconds={3000} durationMilliseconds={1000}/><br /></h2>
+                    <TextGenerate text='Welcome to Scheduler Pro!' cooldownMilliseconds={0} intervalMilliseconds={typeWriterPace} > <br />
+                        <TextGenerate text="Let's get started" intervalMilliseconds={typeWriterPace} > <br />
+                            <TextGenerate text="Enter your institution's name" intervalMilliseconds={typeWriterPace} ><br />
+                                <TextGenerate text="This name will be used by other users to find you" intervalMilliseconds={typeWriterPace} >
+                                    <br /><input type='text' />
+                                </TextGenerate>
+                            </TextGenerate>
+                        </TextGenerate>
+                    </TextGenerate>
                 </div>
+
             </div>
         </section>
     );
