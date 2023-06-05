@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './RatingStars.css'
 
-const RatingStars = ({ totalStars = 5 }) => {
+const RatingStars = ({ totalStars = 5, starColor = '#ffffff' }) => {
     const [selectedStars, setSelectedStars] = useState(0);
     const [hoveredStars, setHoveredStars] = useState(0);
 
@@ -23,6 +23,7 @@ const RatingStars = ({ totalStars = 5 }) => {
                 <i
                     key={index}
                     className={`fa-sharp fa-star fa-${(hoveredStars === 0 ? selectedStars > index : hoveredStars > index) ? 'solid' : 'regular'}`}
+                    style={{ color: starColor, }}
                     onClick={() => handleStarClick(index)}
                     onMouseEnter={() => { handleStarHover(index) }}
                     onMouseLeave={() => { handleStarStopHover() }}

@@ -52,7 +52,7 @@ function AuthContextProvider({ children }) {
   // handle and change states when user signes in or out
   const handleSignIn = data => {
     // greeting user
-    notifySuccess(`Welcome, ${data.username}!`);
+    if (!data.needSetup) notifySuccess(`Welcome, ${data.username}!`);
     // saving nessasary data and invoking ui updates
     localStorage.setItem('token', data.token);
     setUsername(data.username);

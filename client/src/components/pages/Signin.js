@@ -68,7 +68,7 @@ function Signin() {
             <div className='sign-input-box'>
               <label>Password</label>
               <i
-                class={pwVisable ? 'fa-solid fa-eye' : 'fa-solid fa-lock'}
+                class={pwVisable ? 'fa-solid fa-lock' : 'fa-solid fa-eye'}
                 onMouseDown={() => setPwVisable(true)}
                 onMouseUp={() => setPwVisable(false)}
                 onMouseLeave={() => setPwVisable(false)}

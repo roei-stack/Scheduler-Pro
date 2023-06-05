@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function TextGenerate({ text, cooldownMilliseconds = 300, durationMilliseconds, intervalMilliseconds = 25, children }) {
+function TextGenerate({ text, cooldownMilliseconds = 0, durationMilliseconds, intervalMilliseconds = 45, children }) {
     let timer;
     const [partialText, setPartialText] = useState('');
 

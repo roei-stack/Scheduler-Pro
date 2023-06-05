@@ -20,7 +20,7 @@ function Footer() {
                 <p className='footer-subscription-text'>Your rating will be anonymous</p>
                 <div className='input-areas'>
                     <form>
-                        <RatingStars />
+                        <RatingStars starColor='#ffef00'/>
                         <input className='footer-input' name='rating' type='text' placeholder='Additional information' />
                         <Button buttonStyle='btn--outline'>Submit</Button>
                     </form>
