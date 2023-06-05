@@ -1,23 +1,19 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import jwt_decode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
 
 // global objects/variables
 export const APP_NAME = 'Scheduler Pro';
 export const SERVER = 'https://localhost:7147/api';
 // null means the button does not link anywhere (default option), '/' is the home page
 export const LINKS = [null, '/', '/sign-in', '/sign-up', '/services', '/account']; // todo last item fix
-const CLAIM_NAMES = {
-  USERNAME: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
-  ROLE: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
-  EXPIRE: 'exp'
-};
 // create context for authentication
 export const AuthContext = createContext({
   username: '',
   isInstitution: null,
+  isSetupNeeded: null,
   isSignedIn: false,
   handleSignIn: () => { },
   handleSignOut: () => { }
@@ -30,6 +26,7 @@ export const notifyInfo = text => toast.info(text, { position: "bottom-left", th
 function AuthContextProvider({ children }) {
   const [username, setUsername] = useState('');
   const [isInstitution, setIsInstitution] = useState(null);
+  const [isSetupNeeded, setIsSetupNeeded] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -39,33 +36,40 @@ function AuthContextProvider({ children }) {
     const token = localStorage.getItem('token');
     const decodedToken = token ? decodeToken(token) : null;
     if (decodedToken) {
-      const isValid = decodedToken.expire ? Date.now() <= decodedToken.expire * 1000 : false;
+      const isValid = Date.now() <= decodedToken.expire * 1000;
       if (isValid) {
         setUsername(decodedToken.username);
         setIsInstitution(decodedToken.isInstitution);
+        setIsSetupNeeded(decodedToken.isSetupNeeded);
         setIsSignedIn(true);
       } else {
         localStorage.removeItem('token');
       }
     }
     setIsLoading(false);
-  }, [setUsername, setIsInstitution, setIsSignedIn]);
+  }, [setUsername, setIsInstitution, setIsSetupNeeded, setIsSignedIn]);
 
   // handle and change states when user signes in or out
   const handleSignIn = data => {
+    // greeting user
     notifySuccess(`Welcome, ${data.username}!`);
+    // saving nessasary data and invoking ui updates
     localStorage.setItem('token', data.token);
     setUsername(data.username);
     setIsInstitution(data.isInstitution);
+    setIsSetupNeeded(data.needSetup);
     setIsSignedIn(true);
+    // redirecting (institutions must go through first time setups)
     navigate(`/account/${data.username}`);
   };
 
   const handleSignOut = () => {
     notifyInfo('You have been signed out');
+    // removing user's data and invoking ui updates
     localStorage.removeItem('token');
     setUsername('');
     setIsInstitution(null);
+    setIsSetupNeeded(null);
     setIsSignedIn(false);
   };
 
@@ -73,10 +77,12 @@ function AuthContextProvider({ children }) {
   const decodeToken = token => {
     try {
       const decodedToken = jwt_decode(token);
-      const username = decodedToken[CLAIM_NAMES.USERNAME];
-      const isInstitution = decodedToken[CLAIM_NAMES.ROLE] === 'Institution';
-      const expire = decodedToken[CLAIM_NAMES.EXPIRE];
-      return { username, isInstitution, expire };
+      console.log(decodedToken);
+      const username = decodedToken['username'];
+      const isInstitution = decodedToken['isInstitution'] === 'true';
+      const isSetupNeeded = decodedToken['isSetupNeeded'] === 'true';
+      const expire = decodedToken['exp'];
+      return { username, isInstitution, isSetupNeeded, expire };
     } catch (ex) {
       console.error(`Error decoding token: ${ex.message}`);
       return null;
@@ -84,7 +90,7 @@ function AuthContextProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ username, isInstitution, isSignedIn, handleSignIn, handleSignOut }}>
+    <AuthContext.Provider value={{ username, isInstitution, isSetupNeeded, isSignedIn, handleSignIn, handleSignOut }}>
       {/* only render the app once the token has been checked */}
       {!isLoading && children}
       {/* render toast notifications/alerts */}

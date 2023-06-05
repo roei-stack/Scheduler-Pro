@@ -65,7 +65,13 @@ namespace server.Controllers
                         Expires = tokenExpiration 
                     });
                 }
-                return Ok(new { token = token, username = user.Username, isInstitution = user.IsInstitution });
+                return Ok(new 
+                { 
+                    token = token,
+                    username = user.Username,
+                    isInstitution = user.IsInstitution,
+                    needSetup = user.IsInstitution && true
+                });
             }
             else
             {
@@ -91,8 +97,9 @@ namespace server.Controllers
             // Create claims for the token
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.IsInstitution ? "Institution" : "User")
+                new Claim("username", user.Username),
+                new Claim("isInstitution", user.IsInstitution ? "true" : "false"),
+                new Claim("isSetupNeeded", user.IsInstitution && true ? "true" : "false")
             };
 
             var token = new JwtSecurityToken (

@@ -1,5 +1,6 @@
 .home,
 .account,
+.account-setup,
 .services,
 .sign-up,
 .sign-in,
@@ -16,6 +17,10 @@
 
 .account {
     background-color: #2d333b;
+}
+
+.account-setup {
+    background-image: url('/public/images/img-2.jpg');
 }
 
 .sign-in {
@@ -40,4 +45,14 @@
 .not-found small {
     display: flex;
     justify-content: center;
+}
+
+.blur-box {
+    padding: 40px 35px 40px 35px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

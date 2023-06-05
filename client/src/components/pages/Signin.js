@@ -56,7 +56,7 @@ function Signin() {
 
   return (
     <section className='sign-in'>
-      <div className='sign-form-box'>
+      <div className='blur-box'>
         <div>
           <form>
             <h2>Sign in</h2>

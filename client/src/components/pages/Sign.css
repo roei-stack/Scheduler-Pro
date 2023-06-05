@@ -1,4 +1,4 @@
-.sign-form-box {
+/*.sign-form-box {
     padding: 40px 35px 40px 35px;
     border: 2px solid rgba(255, 255, 255, 0.45);
     border-radius: 15px;
@@ -6,7 +6,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
+}*/
 
 .sign-in h2,
 .sign-up h2 {

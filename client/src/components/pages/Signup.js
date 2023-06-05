@@ -62,7 +62,7 @@ function Signup() {
 
   return (
     <section className='sign-up'>
-      <div className='sign-form-box'>
+      <div className='blur-box'>
         <div>
           <form>
             <h2>Sign up</h2>
