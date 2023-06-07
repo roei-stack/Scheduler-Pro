@@ -8,7 +8,7 @@ namespace CourseModel
 {
     public class Course
     {
-        public int GeneralCourseNumber { get; set; }
+        public int CourseId { get; set; }
         public string? CourseName { get; set; }
         public int LeacturePoints { get; set; }
         public int TAPoints { get; set; }
@@ -46,9 +46,12 @@ namespace CourseModel
 
         public override string ToString()
         {
-            return $"General Course Number: {GeneralCourseNumber}\nLecture Occurrences: {LectureOccurrences}\nTA Occurrences: {TAOccurrences}\nTAs After Lecture: {TAsAfterLecture}\nLecture Parts: {LectureParts}\nCourse Staff: {string.Join(", ", CourseStaff)}\nNon-Overlapping Courses: {string.Join(", ", NonOverlappingCourses)}";
+            return $"General Course Number: {CourseId}\nLecture Occurrences: {LectureOccurrences}\nTA Occurrences: {TAOccurrences}\nTAs After Lecture: {TAsAfterLecture}\nLecture Parts: {LectureParts}\nCourse Staff: {string.Join(", ", CourseStaff)}\nNon-Overlapping Courses: {string.Join(", ", NonOverlappingCourses)}";
         }
 
-
+        public int CreditPoints()
+        {
+            return LeacturePoints + TAPoints;
+        }
     }
 }

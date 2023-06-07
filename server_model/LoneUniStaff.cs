@@ -11,17 +11,17 @@ namespace CourseModel
         public string? Role { get; set; }
         public string? Name { get; set; }
         public List<Period> UnavailableTimes { get; set; }
-        public List<(Course, int)> CourseOccurrences { get; set; }
+        public List<(Course, int)> CoursesOccurrences { get; set; }
 
         public LoneUniStaff()
         {
             UnavailableTimes = new List<Period>();
-            CourseOccurrences = new List<(Course, int)>();
+            CoursesOccurrences = new List<(Course, int)>();
         }
 
         public override string ToString()
         {
-            return $"Role: {Role}\nUnavailable Times: {string.Join(", ", UnavailableTimes)}\nCourse Occurrences: {string.Join(", ", CourseOccurrences)}";
+            return $"Role: {Role}\nUnavailable Times: {string.Join(", ", UnavailableTimes)}\nCourse Occurrences: {string.Join(", ", CoursesOccurrences)}";
         }
 
         public bool IsPeriodAvailable(Period period)
