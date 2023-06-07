@@ -10,11 +10,15 @@ namespace CourseModel
     {
         public int MinCreditPoints { get; set; }
         public int MaxCreditPoints { get; set; }
-        public List<Course> courses { get; set; }
+        public List<Course> Courses { get; set; }
+        public int Year { get; set; }
+        public string? Semester { get; set; }
 
-        public CourseBundle()
+        public CourseBundle(int year, string semester)
         {
-            courses = new List<Course>();
+            Courses = new List<Course>();
+            Year = year;
+            Semester = semester;
         }
     }
 }
