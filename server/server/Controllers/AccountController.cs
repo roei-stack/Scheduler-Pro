@@ -16,9 +16,9 @@ namespace server.Controllers
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly UsersAPIDbContext dbContext;
+        private readonly APIDbContext dbContext;
         private readonly KeyManager keyManager;
-        public AccountController(UsersAPIDbContext dbContext, KeyManager keyManager)
+        public AccountController(APIDbContext dbContext, KeyManager keyManager)
         {
             this.dbContext = dbContext;
             this.keyManager = keyManager;
@@ -79,6 +79,21 @@ namespace server.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("checkInstitutionName")]
+        public IActionResult CheckInstitutionName([FromBody] string name)
+        {
+            bool isNameAvailable = !this.dbContext.Institutions.Any(i => i.Name == name);
+
+            if (isNameAvailable)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
         [Authorize]
         [HttpGet("verifyToken")]
@@ -86,7 +101,6 @@ namespace server.Controllers
         {
             return Ok();
         }
-
 
         private string GenerateJWTToken(User user, DateTime expiration)
         {

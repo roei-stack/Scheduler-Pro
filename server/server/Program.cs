@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //in memory database
-builder.Services.AddDbContext<UsersAPIDbContext>(options => options.UseInMemoryDatabase("SchedulerDb"));
+builder.Services.AddDbContext<APIDbContext>(options => options.UseInMemoryDatabase("SchedulerDb"));
 
 // sql database
 // Add-Migration init

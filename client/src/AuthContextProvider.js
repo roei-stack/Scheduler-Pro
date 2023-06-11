@@ -11,6 +11,7 @@ export const SERVER = 'https://localhost:7147/api';
 export const LINKS = [null, '/', '/sign-in', '/sign-up', '/services', '/account']; // todo last item fix
 // create context for authentication
 export const AuthContext = createContext({
+  token: null,
   username: '',
   isInstitution: null,
   isSetupNeeded: null,
@@ -24,6 +25,7 @@ export const notifySuccess = text => toast.success(text, { position: "bottom-lef
 export const notifyInfo = text => toast.info(text, { position: "bottom-left", theme: "dark" });
 
 function AuthContextProvider({ children }) {
+  const [token, setToken] = useState(null);
   const [username, setUsername] = useState('');
   const [isInstitution, setIsInstitution] = useState(null);
   const [isSetupNeeded, setIsSetupNeeded] = useState(null);
@@ -32,12 +34,14 @@ function AuthContextProvider({ children }) {
   const navigate = useNavigate();
 
   // load token from local storage and check if it is valid on component mount
+  // todo maybe empty dependancy array
   useEffect(() => {
     const token = localStorage.getItem('token');
     const decodedToken = token ? decodeToken(token) : null;
     if (decodedToken) {
       const isValid = Date.now() <= decodedToken.expire * 1000;
       if (isValid) {
+        setToken(token);
         setUsername(decodedToken.username);
         setIsInstitution(decodedToken.isInstitution);
         setIsSetupNeeded(decodedToken.isSetupNeeded);
@@ -47,7 +51,7 @@ function AuthContextProvider({ children }) {
       }
     }
     setIsLoading(false);
-  }, [setUsername, setIsInstitution, setIsSetupNeeded, setIsSignedIn]);
+  }, [setToken, setUsername, setIsInstitution, setIsSetupNeeded, setIsSignedIn]);
 
   // handle and change states when user signes in or out
   const handleSignIn = data => {
@@ -55,6 +59,7 @@ function AuthContextProvider({ children }) {
     if (!data.needSetup) notifySuccess(`Welcome, ${data.username}!`);
     // saving nessasary data and invoking ui updates
     localStorage.setItem('token', data.token);
+    setToken(data.token);
     setUsername(data.username);
     setIsInstitution(data.isInstitution);
     setIsSetupNeeded(data.needSetup);
@@ -67,6 +72,7 @@ function AuthContextProvider({ children }) {
     notifyInfo('You have been signed out');
     // removing user's data and invoking ui updates
     localStorage.removeItem('token');
+    setToken(null);
     setUsername('');
     setIsInstitution(null);
     setIsSetupNeeded(null);
@@ -77,7 +83,6 @@ function AuthContextProvider({ children }) {
   const decodeToken = token => {
     try {
       const decodedToken = jwt_decode(token);
-      console.log(decodedToken);
       const username = decodedToken['username'];
       const isInstitution = decodedToken['isInstitution'] === 'true';
       const isSetupNeeded = decodedToken['isSetupNeeded'] === 'true';
@@ -90,7 +95,7 @@ function AuthContextProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ username, isInstitution, isSetupNeeded, isSignedIn, handleSignIn, handleSignOut }}>
+    <AuthContext.Provider value={{ token, username, isInstitution, isSetupNeeded, isSignedIn, handleSignIn, handleSignOut }}>
       {/* only render the app once the token has been checked */}
       {!isLoading && children}
       {/* render toast notifications/alerts */}

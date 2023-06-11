@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from './Button';
 import { notifyError } from '../AuthContextProvider';
 
-function FileUpload({ onSuccess = () => {}, onFailure = () => {}, children }) {
+function FileUpload({ onSuccess = () => { }, parseFileContent = () => { }, children }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isDisabled, setIsDisabled] = useState(false);
 
@@ -19,9 +19,18 @@ function FileUpload({ onSuccess = () => {}, onFailure = () => {}, children }) {
             notifyError('File type must be .txt');
             return;
         }
-        
-        setIsDisabled(true);
-        onSuccess();
+        const reader = new FileReader();
+        reader.onload = e => {
+            const fileContent = e.target.result;
+            try {
+                const parsedData = parseFileContent(fileContent);
+                setIsDisabled(true);
+                onSuccess(parsedData);
+            } catch (error) {
+                notifyError(`Error parsing file: ${error.message}`);
+            }
+        };
+        reader.readAsText(selectedFile);
     }
 
     return (

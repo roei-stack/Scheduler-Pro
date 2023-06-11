@@ -1,0 +1,7 @@
+899001,Computer Science 101,"9-11 on Monday; 8-10 on Sunday","11-13 on Monday; 12-14 on Sunday"
+899002,Mathematics 201,"10-12 on Tuesday; 9-11 on Thursday","14-16 on Wednesday; 13-15 on Friday"
+899003,Physics 301,"13-15 on Monday; 11-13 on Wednesday","9-11 on Tuesday; 8-10 on Friday"
+899004,Chemistry 401,"15-17 on Monday; 13-15 on Thursday","12-14 on Tuesday; 10-12 on Wednesday"
+899005,Biology 501,"14-16 on Tuesday; 12-14 on Thursday","11-13 on Monday; 9-11 on Wednesday"
+899006,History 601,"16-18 on Monday; 15-17 on Wednesday","14-16 on Thursday; 13-15 on Friday"
+899007,English 701,"17-19 on Tuesday; 16-18 on Thursday","15-17 on Monday; 14-16 on Wednesday"
