@@ -12,13 +12,11 @@ namespace CourseModel
         public int MaxCreditPoints { get; set; }
         public List<Course> Courses { get; set; }
         public int Year { get; set; }
-        public string? Semester { get; set; }
 
-        public CourseBundle(int year, string semester)
+        public CourseBundle(int year, List<Course> courses)
         {
-            Courses = new List<Course>();
+            Courses = courses;
             Year = year;
-            Semester = semester;
         }
 
         public HashSet<Course> SampleCourses()

@@ -11,15 +11,17 @@ namespace CourseModel
         public string? Name { get; set; }
         public string? ID { get; set; }
         // staff's input
+        // map(semester) -> times
         public List<Period> UnavailableTimes { get; set; }
         // institution's input
         // map(course) -> map(role) -> course ccurrences
         public Dictionary<Course, Dictionary<string, int>> CoursesRolesOccurrences { get; set; }
 
-        public LoneUniStaff()
+        public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
+            Dictionary<string, int>> coursesRolesOccurrences)
         {
-            UnavailableTimes = new List<Period>();
-            CoursesRolesOccurrences = new Dictionary<Course, Dictionary<string, int>>();
+            UnavailableTimes = unavailableTimes;
+            CoursesRolesOccurrences = coursesRolesOccurrences;
         }
 
 
@@ -29,8 +31,9 @@ namespace CourseModel
             {
                 // Check if the periods overlap
                 if (period.Day == unavailablePeriod.Day &&
-                   (period.StartTime < unavailablePeriod.EndTime &&
-                    period.EndTime > unavailablePeriod.StartTime))
+                    period.Semester == unavailablePeriod.Semester &&
+                    period.StartTime < unavailablePeriod.EndTime &&
+                    period.EndTime > unavailablePeriod.StartTime)
                 {
                     // Overlapping periods found
                     return false;
@@ -59,7 +62,8 @@ namespace CourseModel
 
         public void Schedule(Course course, string role, Period period)
         {
-            throw new NotImplementedException();
+            CoursesRolesOccurrences[course][role]--;
+            UnavailableTimes.Add(period);
         }
     }
 }

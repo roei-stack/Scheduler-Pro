@@ -8,11 +8,11 @@ namespace CourseModel
 {
     public class Course
     {
-        private static readonly string[] Semesters = { "A", "B", "Summer" };
         public string? CourseId { get; set; }
         public string? CourseName { get; set; }
         public int LecturePoints { get; set; }
         public int TAPoints { get; set; }
+        // map(semester) -> occurrences
         public Dictionary<string, int> LectureOccurrences { get; set; }
         public Dictionary<string, int> TAOccurrences { get; set; }
         public int TAsAfterLecture { get; set; }
@@ -41,8 +41,6 @@ namespace CourseModel
             LectureOccurrences = lectureOccurrences;
 
             studentCounter = 0;
-            LectureOccurrences = new Dictionary<string, int>();
-            TAOccurrences = new Dictionary<string, int>();
             CourseStaff = new List<UniStaff>();
             NonOverlappingCourses = new HashSet<Course>();
             tlo = TotalLectureOccurrences();
@@ -57,28 +55,31 @@ namespace CourseModel
 
         private void InitNonAvailableStudants()
         {
-            // Initialize with one-hour periods for each hour in the week
-            for (int day = 1; day <= 6; day++)
+            foreach (var semester in Constants.Semesters)
             {
-                for (int hour = 8; hour < 22; hour++)
+                // Initialize with one-hour periods for each hour in the week
+                for (int day = 1; day <= 6; day++)
                 {
-                    var startTime = TimeSpan.FromHours(hour);
-                    var endTime = TimeSpan.FromHours(hour + 1);
-
-                    var period = new Period { Day = day, StartTime = startTime, EndTime = endTime };
-                    var whatStudantsWant = new List<int>();
-                    for (int i = 0; i < tlo; i++)
+                    for (int hour = 8; hour < 22; hour++)
                     {
-                        whatStudantsWant.Add(0);
+                        var startTime = hour;
+                        var endTime = hour + 1;
+
+                        var period = new Period(day, semester, startTime, endTime);
+                        var whatStudantsWant = new List<int>();
+                        for (int i = 0; i < tlo; i++)
+                        {
+                            whatStudantsWant.Add(0);
+                        }
+                        NonAvailableStudants.Add(period, whatStudantsWant);
                     }
-                    NonAvailableStudants.Add(period, whatStudantsWant);
                 }
             }
         }
 
         private void InitProgressTables()
         {
-            foreach (var semester in Semesters)
+            foreach (var semester in Constants.Semesters)
             {
                 progressTableLeactures[semester] = new Dictionary<int, int>();
                 for (int i = 1; i <= LectureOccurrences[semester]; i++)
@@ -135,7 +136,7 @@ namespace CourseModel
         private int TotalLectureOccurrences()
         {
             int sum = 0;
-            foreach (var semester in Semesters)
+            foreach (var semester in Constants.Semesters)
             {
                 sum += LectureOccurrences[semester];
             }
@@ -147,13 +148,34 @@ namespace CourseModel
             CourseStaff.Add(employee);
         }
 
-        public UniStaff FindLeacturer(Period period, string semester)
+        public UniStaff? FindStaff(Period period, string role)
         {
-
-            // find leacturer
+            Period realPeriod = new Period
+            (
+                period.Day,
+                period.Semester,
+                period.StartTime,
+                period.EndTime + (LecturePoints / LectureParts) - 1
+            );
             foreach (var employee in CourseStaff)
             {
-                if (employee.)
+                if (employee.IsSomeRole(this, role))
+                {
+                    if (employee.IsPeriodAvailable(realPeriod))
+                    {
+                        return employee;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public bool IsOverlapping(Period period, Dictionary<Course, CourseScheduling> SuperCourses)
+        {
+            return false;
+            foreach (var course in NonOverlappingCourses)
+            {
+
             }
         }
     }
