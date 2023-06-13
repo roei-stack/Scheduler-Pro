@@ -5,7 +5,6 @@ import Button from '../Button';
 import './Pages.css';
 import './Account.css';
 
-
 function InstitutionAccount() {
   const [formsIds, setFormsIds] = useState({staffFormId: '', studentFormId: ''});
   const { token } = useContext(AuthContext);
