@@ -1,7 +1,8 @@
-899001,Computer Science 101,"9-11 on Monday; 8-10 on Sunday","11-13 on Monday; 12-14 on Sunday"
-899002,Mathematics 201,"10-12 on Tuesday; 9-11 on Thursday","14-16 on Wednesday; 13-15 on Friday"
-899003,Physics 301,"13-15 on Monday; 11-13 on Wednesday","9-11 on Tuesday; 8-10 on Friday"
-899004,Chemistry 401,"15-17 on Monday; 13-15 on Thursday","12-14 on Tuesday; 10-12 on Wednesday"
-899005,Biology 501,"14-16 on Tuesday; 12-14 on Thursday","11-13 on Monday; 9-11 on Wednesday"
-899006,History 601,"16-18 on Monday; 15-17 on Wednesday","14-16 on Thursday; 13-15 on Friday"
-899007,English 701,"17-19 on Tuesday; 16-18 on Thursday","15-17 on Monday; 14-16 on Wednesday"
+MATH202,Calculus II,4,3,{A:3;B:3;Summer:3},{A:3;B:3;Summer:3},3,2
+CHEM101,General Chemistry,4,2,3,3,2
+PHYS201,Physics I,4,3,{A:3;B:3;Summer:2},3,3,1
+COMP301,Introduction to Computer Science,3,2,{A:3;B:3;Summer:2},1, 1
+ENG101,English Composition,3,2,{A:2;B:2;Summer:2},{A:1;B:1;Summer:1},1,0
+HIST202,World History,3,3,2,2,2,0
+ART101,Introduction to Art,2,2,{A:2;B:2;Summer:2},1,1
+BIOL301,Advanced Biology,4,3,{A:3;B:3;Summer:3},{A:2;B:2;Summer:2}, 1

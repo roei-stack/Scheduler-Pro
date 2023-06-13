@@ -9,9 +9,8 @@ import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import Footer from './components/Footer';
 import Account from './components/pages/Account';
-import InstitutionSetup from './components/pages/InstitutionSetup';
-import './App.css';
 import FormLoader from './components/forms/FormLoader';
+import './App.css';
 
 function App() {
   return (
