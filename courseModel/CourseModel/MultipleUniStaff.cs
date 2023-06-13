@@ -34,14 +34,28 @@ namespace CourseModel
             return SharedCourses.Contains(course);
         }
 
-        public bool IsLecturer(Course course)
+        public bool IsSomeRole(Course course, string role)
         {
-            return true;
+            if (role == Constants.LecturerRole)
+            {
+                foreach (var employee in UniStaffList)
+                {
+                    if (!employee.IsSomeRole(course, role))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
-        public bool IsTA(Course course)
+        public void Schedule(Course course, string role, Period period)
         {
-            return false;
+            foreach (var employee in UniStaffList)
+            {
+                employee.Schedule(course, role, period);
+            }
         }
     }
 }

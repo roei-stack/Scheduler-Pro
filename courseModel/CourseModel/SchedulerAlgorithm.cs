@@ -8,29 +8,29 @@ namespace CourseModel
 {
     public class SchedulerAlgorithm
     {
-        public List<CourseScheduling> SuperCourses { get; set; }
+        public Dictionary<Course, CourseScheduling> SuperCourses { get; set; }
         public InstitutionInput Input { get; set; }
 
         public SchedulerAlgorithm(InstitutionInput input)
         {
             Input = input;
             InputParser(input);
-            SuperCourses = new List<CourseScheduling>();
+            SuperCourses = new Dictionary<Course, CourseScheduling>();
             foreach (var course in input.CourseList)
             {
-                SuperCourses.Add(new CourseScheduling(course));
+                SuperCourses.Add(course, new CourseScheduling(course));
             }
         }
 
         public void Shchedule()
         {
-            foreach (var superCourse in SuperCourses)
+            foreach (var course in SuperCourses.Keys)
             {
-                for (int lecOccu = 0; lecOccu < superCourse.Course.tlo; lecOccu++)
+                for (int lecOccu = 0; lecOccu < course.tlo; lecOccu++)
                 {
-                    for (int lecPart = 0; lecPart < superCourse.Course.LectureParts; lecPart++)
+                    for (int lecPart = 0; lecPart < course.LectureParts; lecPart++)
                     {
-                        LectureSchedule(superCourse, lecOccu, lecPart);
+                        LectureSchedule(SuperCourses[course], lecOccu, lecPart);
                     }
                 }
             }

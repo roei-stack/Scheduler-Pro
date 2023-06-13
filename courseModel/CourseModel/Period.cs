@@ -9,7 +9,16 @@ namespace CourseModel
     public class Period
     {
         public int Day { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public string Semester { get; set; }
+        public int StartTime { get; set; }
+        public int EndTime { get; set; }
+
+        public Period(int day, string semester, int startTime, int endTime)
+        {
+            Day = day;
+            Semester = semester;
+            StartTime = startTime;
+            EndTime = endTime;
+        }
     }
 }

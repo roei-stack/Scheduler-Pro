@@ -10,8 +10,7 @@ namespace CourseModel
     {
         public bool IsPeriodAvailable(Period period);
         public bool IsTeachingCourse(Course course);
-        public bool IsLecturer(Course course);
-        public bool IsTA(Course course);
+        public bool IsSomeRole(Course course, string role);
         public void Schedule(Course course, string role, Period period);
     }
 }
