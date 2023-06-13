@@ -4,7 +4,9 @@
 .services,
 .sign-up,
 .sign-in,
-.not-found {
+.not-found,
+.form,
+.institution-account {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,8 +17,17 @@
     background-position: center;
 }
 
+.institution-account {
+    background-image: url('/public/images/img-5.jpg');
+    font-size: 1.3em;
+}
+
 .account {
     background-color: #2d333b;
+}
+
+.form {
+    background-image: url('/public/images/img-3.jpg');
 }
 
 .account-setup {

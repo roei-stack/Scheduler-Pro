@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Account from './components/pages/Account';
 import InstitutionSetup from './components/pages/InstitutionSetup';
 import './App.css';
+import FormLoader from './components/forms/FormLoader';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path='/sign-in' element={<Signin />} />
           <Route path='/sign-up' element={<Signup />} />
           <Route path='/account/:username' element={<Account />} />
+          <Route path='/form/:formId' element={<FormLoader />}/>
           <Route path='*' element={<NotFound />} />
         </Routes>
         <Footer />

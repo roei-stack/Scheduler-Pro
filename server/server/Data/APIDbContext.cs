@@ -9,6 +9,6 @@ namespace server.Data
         public APIDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Institution> Institutions { get; set; }
+        public DbSet<InstitutionData> InstitutionsData { get; set; }
     }
 }

@@ -17,7 +17,8 @@ export const AuthContext = createContext({
   isSetupNeeded: null,
   isSignedIn: false,
   handleSignIn: () => { },
-  handleSignOut: () => { }
+  handleSignOut: () => { },
+  handleDoneSetup: () => { }
 });
 // create alerting functions, more info: https://fkhadra.github.io/react-toastify/introduction/
 export const notifyError = text => toast.error(text, { position: "bottom-left", theme: "dark" });
@@ -79,6 +80,12 @@ function AuthContextProvider({ children }) {
     setIsSignedIn(false);
   };
 
+  const handleDoneSetup = token => {
+    localStorage.setItem('token', token);
+    setToken(token);
+    setIsSetupNeeded(false);
+  }
+
   // attempt to decode the token with jwt-decode()
   const decodeToken = token => {
     try {
@@ -95,7 +102,7 @@ function AuthContextProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, username, isInstitution, isSetupNeeded, isSignedIn, handleSignIn, handleSignOut }}>
+    <AuthContext.Provider value={{ token, username, isInstitution, isSetupNeeded, isSignedIn, handleSignIn, handleSignOut, handleDoneSetup }}>
       {/* only render the app once the token has been checked */}
       {!isLoading && children}
       {/* render toast notifications/alerts */}
