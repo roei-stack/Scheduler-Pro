@@ -11,6 +11,13 @@
         // map(course) -> map(role) -> course ocurrences
         public Dictionary<Course, Dictionary<string, int>> CoursesRolesOccurrences { get; set; }
 
+        public LoneUniStaff(string id, string name, Dictionary<Course, Dictionary<string, int>> coursesRolesOccurrences)
+        {
+            this.ID = id;
+            this.Name = name;
+            this.CoursesRolesOccurrences = coursesRolesOccurrences;
+        }
+
         public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
             Dictionary<string, int>> coursesRolesOccurrences)
         {

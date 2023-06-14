@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+/*
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Forms.v1;
 using Google.Apis.Forms.v1.Data;
@@ -22,7 +23,7 @@ using System.IO;
 using Google.Apis.Util.Store;
 using System.IO;
 using System.Threading;
-using System.Runtime.Serialization.Formatters;
+using System.Runtime.Serialization.Formatters;*/
 
 namespace server.Controllers
 {
@@ -119,7 +120,7 @@ namespace server.Controllers
                 return Unauthorized();
             }
 
-            bool isNameAvailable = !this.dbContext.InstitutionsData.Any(i => i.InstitutionName == name);
+            bool isNameAvailable = !this.dbContext.InstitutionsData.Any(i => i.InstitutionInput != null && i.InstitutionInput.InstitutionName == name);
 
             if (isNameAvailable)
             {
@@ -154,12 +155,17 @@ namespace server.Controllers
                 return StatusCode(500);
             }
             // SETUP DATA:
-
-            // todo save and verify data...SETUP
-            user.NeedSetup = false;
+            var institutionInput = BuildFromViewModel(institutionName, viewModel);
+            if (institutionInput == null)
+            {
+                return BadRequest();
+            }
+            institutionData.InstitutionInput = institutionInput;
             // create form links
             institutionData.StaffFormId = $"{Guid.NewGuid()}";
             institutionData.StudentFormId = $"{Guid.NewGuid()}";
+            // setup done
+            user.NeedSetup = false;
             await dbContext.SaveChangesAsync();
 
             var newToken = RefreshToken(user);
@@ -218,6 +224,91 @@ namespace server.Controllers
             // Parse the current expiration date
             var expiration = DateTime.UnixEpoch.AddSeconds(long.Parse(currentExpiration));
             return GenerateJWTToken(user, expiration);
+        }
+
+        private InstitutionInput BuildFromViewModel(string name, InstitutionSetupViewModel viewModel)
+        {
+            if (viewModel == null || viewModel.CourseList == null || viewModel.LoneUniStaffList == null || viewModel.MultipleUniStaffList == null || viewModel.CourseBundlesList == null || viewModel.MajorList == null)
+            {
+                return null;
+            }
+
+            List<Course> courseList = viewModel.CourseList.Select(cvm => new Course
+            (
+                cvm.Id,
+                cvm.Name,
+                cvm.Lecture_points,
+                cvm.TA_points,
+                cvm.Lecture_occurrences,
+                cvm.Ta_occurrences,
+                cvm.TA_after_lecture,
+                cvm.Lecture_parts
+            )).ToList();
+            List<LoneUniStaff> loneUniStaffList = viewModel.LoneUniStaffList.Select(item => new LoneUniStaff
+            (
+                item.Id,
+                item.Name,
+                ConvertCourseRolesOccurances(item.CoursesRolesOccurrences, courseList)
+            )).ToList();
+
+            List<MultipleUniStaff> multipleUniStaffList = viewModel.MultipleUniStaffList.Select(item => new MultipleUniStaff
+            (
+                courseList.Where(c => item.SharedCourses.Contains(c.CourseId)).ToList(),
+                loneUniStaffList.Where(s => item.StaffList.Contains(s.ID)).OfType<UniStaff>().ToList()
+            )).ToList();
+            List<UniStaff> uniStaffList = loneUniStaffList.Cast<UniStaff>().Concat(multipleUniStaffList.Cast<UniStaff>()).ToList();
+
+            List<CourseBundle> courseBundles = viewModel.CourseBundlesList.Select(item => new CourseBundle
+            (
+                item.Id,
+                item.MinCreditPoints,
+                item.MaxCreditPoints,
+                courseList.Where(c => item.Courses.Contains(c.CourseId)).ToList()
+            )).ToList();
+            
+            List<Major> majorsList = new List<Major>();
+
+            foreach (var majorVm in viewModel.MajorList)
+            {
+                var majorName = majorVm.MajorName;
+                var bundles = new Dictionary<int, List<CourseBundle>>();
+                foreach(var bundleId in majorVm.Bundles)
+                {
+                    var bundle = courseBundles.FirstOrDefault(b => b.ID == bundleId);
+                    var year = viewModel.CourseBundlesList.FirstOrDefault(bvm => bvm.Id == bundleId).Year;
+
+                    if (!bundles.ContainsKey(year))
+                    {
+                        bundles[year] = new List<CourseBundle>();
+                    }
+
+                    bundles[year].Add(bundle);
+                }
+                var major = new Major(majorName, bundles);
+                majorsList.Add(major);
+            }
+
+            var input = new InstitutionInput(name, courseList, uniStaffList, null, majorsList);
+            return input;
+        }
+
+        private Dictionary<Course, Dictionary<string, int>> ConvertCourseRolesOccurances(Dictionary<string, Dictionary<string, int>> dictionaryByIds, List<Course> courseList)
+        {
+            Dictionary<Course, Dictionary<string, int>> convertedDictionary = new Dictionary<Course, Dictionary<string, int>>();
+
+            foreach (var kvp in dictionaryByIds)
+            {
+                string courseId = kvp.Key;
+                Dictionary<string, int> courseRoles = kvp.Value;
+
+                Course course = courseList.FirstOrDefault(c => c.CourseId == courseId);
+                if (course != null)
+                {
+                    convertedDictionary.Add(course, courseRoles);
+                }
+            }
+
+            return convertedDictionary;
         }
 
         private string GenerateJWTToken(User user, DateTime expiration)

@@ -11,7 +11,6 @@
         public Dictionary<string, int> TAOccurrences { get; set; }
         public int TAsAfterLecture { get; set; }
         public int LectureParts { get; set; }
-        public bool IsYearlyClass { get; set; }
 
         // not input
         public List<UniStaff> CourseStaff { get; set; }
@@ -28,10 +27,23 @@
         public List<Period> TheUnoverlapableTimes;
         // how many students are in this course
         private int studentNumber;
+        
+        public Course(string CourseId, string CourseName, int LecturePoints, int TAPoints,
+            Dictionary<string, int> LectureOccurrences, Dictionary<string, int> TAOccurrences, int TAsAfterLecture, int LectureParts)
+        {
+            this.CourseId = CourseId;
+            this.CourseName = CourseName;
+            this.LecturePoints = LecturePoints;
+            this.TAPoints = TAPoints;
+            this.LectureOccurrences = LectureOccurrences;
+            this.TAOccurrences = TAOccurrences;
+            this.TAsAfterLecture = TAsAfterLecture;
+            this.LectureParts = LectureParts;
+        }
 
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
             Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
-            int LectureParts, bool isYearlyClass)
+            int LectureParts)
         {
             LecturePoints = lecturePoints;
             this.TAPoints = TAPoints;
@@ -39,7 +51,6 @@
             this.TAsAfterLecture = TAsAfterLecture;
             this.LectureParts = LectureParts;
             LectureOccurrences = lectureOccurrences;
-            IsYearlyClass = isYearlyClass;
 
             studentNumber = 0;
             studentCounter = 0;
@@ -53,7 +64,6 @@
             progressTableLeactures = new Dictionary<string, Dictionary<int, int>>();
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
             InitProgressTables();
-            IsYearlyClass = isYearlyClass;
 
             TheUnoverlapableTimes = new List<Period>();
         }
