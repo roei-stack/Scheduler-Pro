@@ -4,8 +4,7 @@ import TextGenerate from '../TextGenerate';
 import Button from '../Button';
 import FileUpload from '../FileUpload';
 import { AuthContext, SERVER, notifyError } from '../../AuthContextProvider';
-import { parseCoursesFileContent, parseStaffFileContent } from '../../fileUtils';
-import { useNavigate } from 'react-router-dom';
+import { parseCoursesFileContent, parseStaffFileContent, parseMajorsFileContent } from '../../fileUtils';
 
 const STAGES = 4;
 
@@ -13,7 +12,7 @@ const STAGES = 4;
 const fileStages = {
     2: { text: 'Courses list', parseFunction: parseCoursesFileContent },
     3: { text: 'Staff list', parseFunction: parseStaffFileContent },
-    4: { text: 'Majors list', parseFunction: () => { return ["c"] } },
+    4: { text: 'Majors list', parseFunction: parseMajorsFileContent },
 };
 
 const FETCH_STATES = {

@@ -1,0 +1,10 @@
+LoneUniStaff
+1,John Doe,{CS101: {Lecturer: 2} ; MATH101: {Lecturer: 1; TA: 1}}
+2,Jane Smith,{MATH202: {Lecturer: 3} ; PHYS101: {Lecturer: 2}}
+3,David Johnson,{CHEM101: {Lecturer: 2} ; BIOLOGY201: {Lecturer: 1; TA: 1}}
+4,Sarah Adams,{PHYS202: {Lecturer: 2} ; CS201: {Lecturer: 1; TA: 1}}
+5,Michael Brown,{ENGLISH101: {Lecturer: 2} ; HISTORY202: {Lecturer: 1; TA: 1}}
+
+MultipleUniStaff
+1;2;3,MATH;CS101
+4;5,ENGLISH;HISTORY202

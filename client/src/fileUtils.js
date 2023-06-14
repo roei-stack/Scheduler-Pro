@@ -120,5 +120,92 @@ const parseDictionary = (dictionaryString, fieldName) => {
 };
 
 export const parseStaffFileContent = fileContent => {
-    
+    const lines = fileContent.split('\n');
+    const staffData = { loneUniStaff: [], multipleUniStaff: [] };
+    let currentSection = null;
+
+    for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
+
+        if (trimmed === 'LoneUniStaff') {
+            currentSection = 'loneUniStaff';
+        } else if (trimmed === 'MultipleUniStaff') {
+            currentSection = 'multipleUniStaff';
+        } else if (trimmed) {
+            const parts = trimmed.split(',');
+            try {
+                if (currentSection === 'loneUniStaff') {
+                    if (parts.length !== 3) {
+                        throw new Error(`LoneUniStaff: Invalid number of fields, expected 3 (LoneUniStaff)`);
+                    }
+                    staffData.loneUniStaff.push({
+                        id: parseString(parts[0], 'id'),
+                        name: parseString(parts[1], 'name'),
+                        coursesRolesOccurrences: parseCoursesRolesOccurrences(parts[2], 'coursesRolesOccurrences')
+                    });
+                } else if (currentSection === 'multipleUniStaff') {
+                    if (parts.length !== 2) {
+                        throw new Error(`MultipleUniStaff: Invalid number of fields, expected 2`);
+                    }
+                    staffData.multipleUniStaff.push({
+                        staffList: parts[0].split(';').map(id => parseString(id, "staffList id's")),
+                        sharedCourses: parts[1].split(';').map(course => parseString(course, "shared courses list"))
+                    });
+                }
+            } catch (error) {
+                throw new Error(`Failed to parse staff at line ${i + 1}: ${error.message}`);
+            }
+        }
+    }
+    return staffData;
+    // todo check for duplicates
+}
+
+const parseCoursesRolesOccurrences = (coursesRolesOccurrences, fieldName) => {
+    try {
+        const preparedStr = coursesRolesOccurrences.trim().replace(/(\w+):/g, '"$1":').replace(/;/g, ',');
+        const dictionaryObj = JSON.parse(preparedStr);
+
+        if (typeof dictionaryObj !== 'object' || Array.isArray(dictionaryObj)) {
+            throw new Error(`Invalid format for CoursesRolesOccurrences. Dictionary must be provided.`);
+        }
+
+        const parsedOccurrences = {};
+
+        for (const key in dictionaryObj) {
+            if (typeof key !== 'string') {
+                throw new Error(`Invalid format for CoursesRolesOccurrences. Invalid key: ${key}`);
+            }
+
+            const value = dictionaryObj[key];
+
+            if (typeof value !== 'object' || Array.isArray(value)) {
+                throw new Error(`Invalid format for CoursesRolesOccurrences. Invalid value for key '${key}': ${value}`);
+            }
+
+            const parsedValue = {};
+
+            for (const role in value) {
+                if (role !== 'Lecturer' && role !== 'TA') {
+                    throw new Error(`Invalid format for CoursesRolesOccurrences. Invalid role for key '${key}': ${role}`);
+                }
+
+                const occurrences = value[role];
+
+                if (typeof occurrences !== 'number' || occurrences < 0) {
+                    throw new Error(`Invalid format for CoursesRolesOccurrences. Invalid occurrences for key '${key}', role '${role}': ${occurrences}`);
+                }
+
+                parsedValue[role] = occurrences;
+            }
+            parsedOccurrences[key] = parsedValue;
+        }
+        return parsedOccurrences;
+    } catch (error) {
+        throw new Error(`Invalid format for CoursesRolesOccurrences. Failed to parse the dictionary: ${coursesRolesOccurrences}`);
+    }
+};  
+
+export const parseMajorsFileContent = fileContent => {
+    return ["majors"];
 }
