@@ -1,7 +1,28 @@
-// id,name,lecture_points,TA_points,lecture_occurrences,TA_occurrences,lecture_parts,TA_after_lecture
+/*
+CourseID, CourseName, LecturePoints, TAPoints, LectureOccurrences, TAOccurrences, LectureParts, TAAfterLecture
+
+- `CourseID`: A unique identifier for the course.
+- `CourseName`: The name of the course.
+- `LecturePoints`: The number of points/credits assigned to the lecture.
+- `TAPoints`: The number of points/credits assigned to the teaching assistant (TA).
+- `LectureOccurrences`: A dictionary or integer specifying the lecture occurrences for different semesters. It can be provided as a dictionary in the format `{A: value, B: value, Summer: value}` or as an integer that will be applied to all semesters.
+- `TAOccurrences`: A dictionary or integer specifying the TA occurrences for different semesters. It follows the same format as `LectureOccurrences`.
+- `LectureParts`: The number of parts or sessions the lecture is divided into during the week.
+- `TAAfterLecture` (optional): The number of times the TA comes after the lecture during the week. If not provided, it defaults to 0.
+
+Here's an example of how a `course.txt` file can be prepared:
+
+MATH202,Calculus II,4,3,{A:3;B:3;Summer:3},{A:3;B:3;Summer:3},3,2
+CHEM101,General Chemistry,4,2,3,3,2
+PHYS201,Physics I,4,3,{A:3;B:3;Summer:2},3,3,1
+COMP301,Introduction to Computer Science,3,2,{A:3;B:3;Summer:2},1, 1
+
+Ensure that each line follows the specified format, with the values properly separated by commas.
+*/
 export const parseCoursesFileContent = fileContent => {
     const lines = fileContent.split('\n');
     const courses = [];
+    const parsedCourseIds = new Set();
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -12,6 +33,10 @@ export const parseCoursesFileContent = fileContent => {
 
         if (parts.length < 7 || parts.length > 8) {
             throw new Error(`Invalid number of fields on line ${i + 1}`);
+        }
+
+        if (parsedCourseIds.has(parts[0].trim())) {
+            throw new Error(`Duplicate course ID '${parts[0].trim()}' at line ${i + 1}`);
         }
         try {
             const course = {
@@ -24,6 +49,7 @@ export const parseCoursesFileContent = fileContent => {
                 lecture_parts: parseInteger(parts[6], 'lecture_parts'),
                 TA_after_lecture: parts[7] ? parseInteger(parts[7], 'TA_after_lecture') : 0,
             };
+            parsedCourseIds.add(course.id);
             courses.push(course);
         } catch (error) {
             throw new Error(`Failed to parse course at line ${i + 1}: ${error.message}`);
@@ -93,34 +119,6 @@ const parseDictionary = (dictionaryString, fieldName) => {
     }
 };
 
-const parseTimes = (timesString, line) => {
-    const times = timesString.split(';').map(time => time.trim());
-    const parsedTimes = [];
-
-    for (const time of times) {
-        // format: [start-hour]-[end-hour] on [day]
-        // for example: 12-14 on sunday
-        const match = time.match(/^(\d{1,2})-(\d{1,2}) on (\w+)$/);
-
-        if (!match) {
-            throw new Error(`Invalid time format on line ${line}. Expected 'start-end on day'. Time: ${time}`);
-        }
-
-        const startHour = parseInt(match[1], 10);
-        const endHour = parseInt(match[2], 10);
-        const day = match[3];
-
-        if (startHour >= endHour) {
-            throw new Error(`Invalid time range on line ${line}. Start hour must be before end hour. Time: ${time}`);
-        }
-
-        const parsedTime = {
-            startHour,
-            endHour,
-            day,
-        };
-
-        parsedTimes.push(parsedTime);
-    }
-    return parsedTimes;
-};
+export const parseStaffFileContent = fileContent => {
+    
+}

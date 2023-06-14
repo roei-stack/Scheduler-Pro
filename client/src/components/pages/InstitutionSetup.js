@@ -4,17 +4,16 @@ import TextGenerate from '../TextGenerate';
 import Button from '../Button';
 import FileUpload from '../FileUpload';
 import { AuthContext, SERVER, notifyError } from '../../AuthContextProvider';
-import { parseCoursesFileContent } from '../../fileUtils';
+import { parseCoursesFileContent, parseStaffFileContent } from '../../fileUtils';
 import { useNavigate } from 'react-router-dom';
 
-const STAGES = 5;
+const STAGES = 4;
 
-// parse function accepts a string, and it returns data/throws an error when it fails
+// parse function accepts a string, and returns the parsed data/throws an error when it fails
 const fileStages = {
     2: { text: 'Courses list', parseFunction: parseCoursesFileContent },
-    3: { text: 'Students list', parseFunction: () => { return ["a"] } },
-    4: { text: 'Lectures list', parseFunction: () => { return ["b"] } },
-    5: { text: 'Majors list', parseFunction: () => { return ["c"] } },
+    3: { text: 'Staff list', parseFunction: parseStaffFileContent },
+    4: { text: 'Majors list', parseFunction: () => { return ["c"] } },
 };
 
 const FETCH_STATES = {
