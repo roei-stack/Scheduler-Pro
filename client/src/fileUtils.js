@@ -44,8 +44,8 @@ export const parseCoursesFileContent = fileContent => {
                 name: parseString(parts[1], 'name'),
                 lecture_points: parseInteger(parts[2], 'lecture_points'),
                 TA_points: parseInteger(parts[3], 'TA_points'),
-                lecture_occurrences: parseDictionary(parts[4], 'lecture_occurrences'),
-                TA_occurrences: parseDictionary(parts[5], 'TA_occurrences'),
+                lecture_occurrences: parseDictionary(parts[4], 'lecture_occurrences', `${parts[0].trim()}_lecture`),
+                TA_occurrences: parseDictionary(parts[5], 'TA_occurrences', `${parts[0].trim()}_TA`),
                 lecture_parts: parseInteger(parts[6], 'lecture_parts'),
                 TA_after_lecture: parts[7] ? parseInteger(parts[7], 'TA_after_lecture') : 0,
             };
@@ -80,7 +80,7 @@ const parseInteger = (value, fieldName) => {
     return parsedValue;
 };
 
-const parseDictionary = (dictionaryString, fieldName) => {
+const parseDictionary = (dictionaryString, fieldName, id) => {
     const trimmed = dictionaryString.trim();
     if (!trimmed.startsWith('{') && !trimmed.endsWith('}')) {
         const occurrences = parseInt(trimmed.trim(), 10);

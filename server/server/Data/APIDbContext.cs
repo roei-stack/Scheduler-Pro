@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Models;
+using server.ViewModels;
 
 // DbContext is a class that communicates with the database
 namespace server.Data

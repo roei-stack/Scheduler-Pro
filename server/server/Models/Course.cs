@@ -1,7 +1,10 @@
-﻿namespace server.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace server.Models
 {
     public class Course
     {
+        [Key]
         public string? CourseId { get; set; }
         public string? CourseName { get; set; }
         public int LecturePoints { get; set; }
