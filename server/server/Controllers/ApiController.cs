@@ -153,6 +153,8 @@ namespace server.Controllers
                 // we should not be here
                 return StatusCode(500);
             }
+            // SETUP DATA:
+
             // todo save and verify data...SETUP
             user.NeedSetup = false;
             // create form links
