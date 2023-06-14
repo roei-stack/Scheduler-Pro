@@ -119,6 +119,39 @@ const parseDictionary = (dictionaryString, fieldName) => {
     }
 };
 
+/*
+To prepare the `staff.txt` file for parsing, follow the given structure:
+
+LoneUniStaff:
+- Start this section by the line "LoneUniStaff".
+- Each line represents a lone university staff member.
+- The format for each line is as follows:
+  - Staff ID (string)
+  - Staff Name (string)
+  - Courses Roles Occurrences (dictionary)
+
+Example:
+
+LoneUniStaff
+1,John Doe,{CS101: {Lecturer: 2} ; MATH101: {Lecturer: 1; TA: 1}}
+2,Jane Smith,{MATH202: {Lecturer: 3} ; PHYS101: {Lecturer: 2}}
+3,David Johnson,{CHEM101: {Lecturer: 2} ; BIOLOGY201: {Lecturer: 1; TA: 1}}
+
+Each staff has an ID, name, and the courses they are associated with along with their respective roles and occurrences.
+
+MultipleUniStaff:
+- Start this section by the line "MultipleUniStaff".
+- This section represents a group of university staff members sharing the same lecture.
+- each line contains semicolon-separated staff IDs, a comma, and semicolon-separated course ID's.
+
+Example:
+
+MultipleUniStaff
+1;2,MATH202;CS101
+
+In this example, there is one group of university staff members.
+It consists of staff with IDs 1 and 2, who share the courses MATH202 and CS101.
+ */
 export const parseStaffFileContent = fileContent => {
     const lines = fileContent.split('\n');
     const staffData = { loneUniStaff: [], multipleUniStaff: [] };
@@ -136,20 +169,20 @@ export const parseStaffFileContent = fileContent => {
             try {
                 if (currentSection === 'loneUniStaff') {
                     if (parts.length !== 3) {
-                        throw new Error(`LoneUniStaff: Invalid number of fields, expected 3 (LoneUniStaff)`);
+                        throw new Error(`LoneUniStaff: Invalid number of fields, expected 3`);
                     }
                     staffData.loneUniStaff.push({
                         id: parseString(parts[0], 'id'),
                         name: parseString(parts[1], 'name'),
-                        coursesRolesOccurrences: parseCoursesRolesOccurrences(parts[2], 'coursesRolesOccurrences')
+                        coursesRolesOccurrences: parseCoursesRolesOccurrences(parts[2])
                     });
                 } else if (currentSection === 'multipleUniStaff') {
                     if (parts.length !== 2) {
                         throw new Error(`MultipleUniStaff: Invalid number of fields, expected 2`);
                     }
                     staffData.multipleUniStaff.push({
-                        staffList: parts[0].split(';').map(id => parseString(id, "staffList id's")),
-                        sharedCourses: parts[1].split(';').map(course => parseString(course, "shared courses list"))
+                        staffList: parts[0].trim().split(';').map(id => parseString(id, "staffList id's")),
+                        sharedCourses: parts[1].trim().split(';').map(course => parseString(course, "shared courses list"))
                     });
                 }
             } catch (error) {
@@ -159,9 +192,9 @@ export const parseStaffFileContent = fileContent => {
     }
     return staffData;
     // todo check for duplicates
-}
+};
 
-const parseCoursesRolesOccurrences = (coursesRolesOccurrences, fieldName) => {
+const parseCoursesRolesOccurrences = coursesRolesOccurrences => {
     try {
         const preparedStr = coursesRolesOccurrences.trim().replace(/(\w+):/g, '"$1":').replace(/;/g, ',');
         const dictionaryObj = JSON.parse(preparedStr);
@@ -204,8 +237,112 @@ const parseCoursesRolesOccurrences = (coursesRolesOccurrences, fieldName) => {
     } catch (error) {
         throw new Error(`Invalid format for CoursesRolesOccurrences. Failed to parse the dictionary: ${coursesRolesOccurrences}`);
     }
-};  
+};
 
+/*
+To prepare the majors.txt file for parsing, follow the given structure:
+
+CourseBundles:
+- Start this section by the line "CourseBundles".
+- Each line represents a course bundle.
+- The format for each line is: `bundleId, minCreditPoints, maxCreditPoints, year, courseId1;courseId2;courseId3;..;courseId_n.`
+- `bundleId` is a unique identifier for the bundle.
+- `minCreditPoints` and `maxCreditPoints` represent the minimum and maximum credit points for the bundle.
+- `year` represents the minimum year a student can take this bundle.
+- `courseId1;courseId2;courseId3;...` is a semicolon-separated list of course IDs included in the bundle.
+
+Majors:
+- Each line represents a major.
+- The format for each line is: `majorName, bundleId1;bundleId2;bundleId3;...;bundle_i`
+- The `majorName` is a unique identifier for the major.
+- `bundleId1;bundleId2;bundleId3;...` is a semicolon-separated list of bundle IDs associated with the major.
+
+Example File:
+
+CourseBundles
+CS_Bundle1, 4, 8, 1, CS101;CS102;CS201
+CS_Bundle2, 6, 12, 2, CS201;CS202;CS301;CS302
+Math_Bundle1, 6, 10, 1, MATH101;MATH102
+Math_Bundle2, 6, 12, 2, MATH201;MATH202;MATH301
+Physics_Bundle1, 8, 14, 1, PHYS101;PHYS102;PHYS201;PHYS202
+
+Majors
+Computer Science, CS_Bundle1;CS_Bundle2;Math_Bundle1
+Mathematics, Math_Bundle1;Math_Bundle2;CS_Bundle1
+Physics, Physics_Bundle1;Math_Bundle1
+*/
 export const parseMajorsFileContent = fileContent => {
-    return ["majors"];
-}
+    const lines = fileContent.split('\n');
+    const MajorsData = { courseBundles: [], majors: [] };
+    let currentSection = null;
+    const bundleIds = new Set();
+    const majorNames = new Set();
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        // ignore empty lines
+        if (line === '') continue;
+        const parts = line.split(',');
+        try {
+            if (line === 'CourseBundles' || line === 'Majors') {
+                currentSection = line;
+
+            } else if (currentSection === 'CourseBundles') {
+                if (parts.length !== 5) {
+                    throw new Error(`CourseBundles: Invalid number of fields, expected 5`);
+                }
+                // check duplicate bundle id's
+                const bundleId = parseString(parts[0], 'id');
+                if (bundleIds.has(bundleId)) {
+                    throw new Error(`CourseBundles: Duplicate bundle ID '${bundleId}'`);
+                }
+                // check duplicate courses id's
+                const courses = parts[4].trim().split(';').map(cid => parseString(cid, "course ID's"));
+                if (courses.length === 0 || new Set(courses).size !== courses.length) {
+                    throw new Error(`CourseBundles: Empty or Duplicate course ID/s in bundle '${bundleId}'`);
+                }
+                MajorsData.courseBundles.push({
+                    id: bundleId,
+                    minCreditPoints: parseInteger(parts[1], 'minCreditPoints'),
+                    maxCreditPoints: parseInteger(parts[2], 'maxCreditPoints'),
+                    year: parseInteger(parts[3], 'year'),
+                    courses: courses
+                });
+                bundleIds.add(bundleId);
+
+            } else if (currentSection === 'Majors') {
+                if (parts.length !== 2) {
+                    throw new Error(`Majors: Invalid number of fields, expected 2`);
+                }
+                // check duplicate major name
+                const majorName = parseString(parts[0], 'majorName');
+                if (majorNames.has(majorName)) {
+                    throw new Error(`Majors: Duplicate major name '${majorName}'`);
+                }
+                // check for duplicate bundle id's
+                const bundles = parts[1].trim().split(';').map(bid => parseString(bid, "bundle ID's"));
+                if (bundles.length === 0 || new Set(bundles).size !== bundles.length) {
+                    throw new Error(`Majors: Duplicate bundle ID's in major '${majorName}'`);
+                }
+                MajorsData.majors.push({
+                    majorName: majorName,
+                    bundles: bundles
+                });
+                majorNames.add(majorName);
+            }
+
+        } catch (error) {
+            throw new Error(`Failed to parse majors at line ${i + 1}: ${error.message}`);
+        }
+    }
+    // make sure bundles in majors exist
+    MajorsData.majors.forEach(major => {
+        major.bundles.forEach(bundleId => {
+            if (!bundleIds.has(bundleId)) {
+                throw new Error(`Bundle ID '${bundleId}' from major ${major.majorName} does not exist in courseBundles`);
+            }
+        })
+    })
+    return MajorsData;
+    // todo check courses id's valid
+};
