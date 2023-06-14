@@ -120,4 +120,3 @@ C:\Users\Roei\Desktop\FinalProject\server\server\bin\Debug\net6.0\System.Web.Web
 C:\Users\Roei\Desktop\FinalProject\server\server\bin\Debug\net6.0\System.Web.WebPages.dll
 C:\Users\Roei\Desktop\FinalProject\server\server\bin\Debug\net6.0\Microsoft.Web.Infrastructure.dll
 C:\Users\Roei\Desktop\FinalProject\server\server\bin\Debug\net6.0\Newtonsoft.Json.dll
-C:\Users\Roei\Desktop\FinalProject\server\server\bin\Debug\net6.0\credentials\client_secret_707695918729-sdmihrfcqvfqpuoapmpqkfbj57kl0c0d.apps.googleusercontent.com.json

@@ -6,5 +6,5 @@ LoneUniStaff
 5,Michael Brown,{ENGLISH101: {Lecturer: 2} ; HISTORY202: {Lecturer: 1; TA: 1}}
 
 MultipleUniStaff
-1;2;3,MATH;CS101
-4;5,ENGLISH;HISTORY202
+1;2;3,MATH202;CS101
+4;5,ENGLISH101;HISTORY202

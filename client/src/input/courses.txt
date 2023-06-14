@@ -1,8 +1,22 @@
-MATH202,Calculus II,4,3,{A:3;B:3;Summer:3},{A:3;B:3;Summer:3},3,2
-CHEM101,General Chemistry,4,2,3,3,2
-PHYS201,Physics I,4,3,{A:3;B:3;Summer:2},3,3,1
-COMP301,Introduction to Computer Science,3,2,{A:3;B:3;Summer:2},1, 1
+MATH202,Calculus II,4,3,{A:3;B:3;Summer:3},{A:3;B:3;Summer:3},2,2
+CHEM101,General Chemistry,4,2,3,2,2
+PHYS201,Physics I,4,3,{A:3;B:3;Summer:2},3,2,1
+COMP301,Introduction to Computer Science,2,2,{A:3;B:3;Summer:2},1, 1
 ENG101,English Composition,3,2,{A:2;B:2;Summer:2},{A:1;B:1;Summer:1},1,0
-HIST202,World History,3,3,2,2,2,0
+HIST202,World History,3,3,2,2,1,0
 ART101,Introduction to Art,2,2,{A:2;B:2;Summer:2},1,1
 BIOL301,Advanced Biology,4,3,{A:3;B:3;Summer:3},{A:2;B:2;Summer:2}, 1
+CS101,Introduction to computer science,2,1,2,2,1
+MATH101,Introduction to math,2,1,1,1,1
+MATH201,Algebra 1,2,1,1,1,1
+MATH301,Algebra 2,2,1,1,1,1
+PHYS101, Introduction to physics, 2,1,1,1,1
+BIOLOGY201, Introduction to biology, 2,1,1,1,1
+PHYS202, advanced physics, 2,1,1,1,1
+CS201, advanced programming 1, 2,1,1,1,1
+ENGLISH101, English for beginners, 2,1,1,1,1
+HISTORY202, The infomous mustache, 2,1,1,1,1
+CS202, Algorithms 1, 2,1,1,1,1
+CS301, advanced programming 2, 2,1,1,1,1
+MATH102, Calculous I, 2,1,1,1,1
+PHYS102, Classic physics I, 2,1,1,1,1

@@ -23,9 +23,7 @@ function FileUpload({ onSuccess = () => { }, parseFileContent = () => { }, child
         reader.onload = e => {
             const fileContent = e.target.result;
             try {
-                console.log('now');
                 const parsedData = parseFileContent(fileContent);
-                console.log(parsedData);
                 setIsDisabled(true);
                 onSuccess(parsedData);
             } catch (error) {
