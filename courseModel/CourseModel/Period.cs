@@ -41,7 +41,7 @@ namespace CourseModel
 
         public bool IsTheDayEnds()
         {
-            return (EndTime > Constants.MaxHour);
+            return EndTime > Constants.MaxHour;
         }
     }
 }
