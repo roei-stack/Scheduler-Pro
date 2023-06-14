@@ -17,6 +17,7 @@ namespace CourseModel
         public Dictionary<string, int> TAOccurrences { get; set; }
         public int TAsAfterLecture { get; set; }
         public int LectureParts { get; set; }
+        public bool IsYearlyClass { get; set; }
 
         // not input
         public List<UniStaff> CourseStaff { get; set; }
@@ -31,7 +32,8 @@ namespace CourseModel
         private Dictionary<string, Dictionary<int, int>> progressTableTAs;
 
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
-            Dictionary<string, int> TAOccurrences, int TAsAfterLecture, int LectureParts)
+            Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
+            int LectureParts, bool isYearlyClass)
         {
             LecturePoints = lecturePoints;
             this.TAPoints = TAPoints;
@@ -39,6 +41,7 @@ namespace CourseModel
             this.TAsAfterLecture = TAsAfterLecture;
             this.LectureParts = LectureParts;
             LectureOccurrences = lectureOccurrences;
+            IsYearlyClass = isYearlyClass;
 
             studentCounter = 0;
             CourseStaff = new List<UniStaff>();
@@ -51,6 +54,7 @@ namespace CourseModel
             progressTableLeactures = new Dictionary<string, Dictionary<int, int>>();
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
             InitProgressTables();
+            IsYearlyClass = isYearlyClass;
         }
 
         private void InitNonAvailableStudants()
