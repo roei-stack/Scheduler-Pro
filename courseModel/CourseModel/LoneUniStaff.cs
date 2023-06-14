@@ -14,7 +14,7 @@ namespace CourseModel
         // map(semester) -> times
         public List<Period> UnavailableTimes { get; set; }
         // institution's input
-        // map(course) -> map(role) -> course ccurrences
+        // map(course) -> map(role) -> course ocurrences
         public Dictionary<Course, Dictionary<string, int>> CoursesRolesOccurrences { get; set; }
 
         public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
@@ -24,23 +24,9 @@ namespace CourseModel
             CoursesRolesOccurrences = coursesRolesOccurrences;
         }
 
-
         public bool IsPeriodAvailable(Period period)
         {
-            foreach (var unavailablePeriod in UnavailableTimes)
-            {
-                // Check if the periods overlap
-                if (period.Day == unavailablePeriod.Day &&
-                    period.Semester == unavailablePeriod.Semester &&
-                    period.StartTime < unavailablePeriod.EndTime &&
-                    period.EndTime > unavailablePeriod.StartTime)
-                {
-                    // Overlapping periods found
-                    return false;
-                }
-            }
-            // No overlapping periods found
-            return true;
+            return !period.IsPeriodOverlap(UnavailableTimes);
         }
 
         public bool IsTeachingCourse(Course course)

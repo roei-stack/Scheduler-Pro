@@ -30,6 +30,8 @@ namespace CourseModel
         // map(semster) -> map(course group) -> part that left
         private Dictionary<string, Dictionary<int, int>> progressTableLeactures;
         private Dictionary<string, Dictionary<int, int>> progressTableTAs;
+        public List<Period> TheUnoverlapableLecture;
+        public Period? TheUnoverlapableTA;
 
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
             Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
@@ -55,6 +57,9 @@ namespace CourseModel
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
             InitProgressTables();
             IsYearlyClass = isYearlyClass;
+
+            TheUnoverlapableLecture = new List<Period>();
+            TheUnoverlapableTA = null;
         }
 
         private void InitNonAvailableStudants()
@@ -64,7 +69,7 @@ namespace CourseModel
                 // Initialize with one-hour periods for each hour in the week
                 for (int day = 1; day <= 6; day++)
                 {
-                    for (int hour = 8; hour < 22; hour++)
+                    for (int hour = 8; hour < Constants.MaxHour; hour++)
                     {
                         var startTime = hour;
                         var endTime = hour + 1;
@@ -152,15 +157,30 @@ namespace CourseModel
             CourseStaff.Add(employee);
         }
 
-        public UniStaff? FindStaff(Period period, string role)
+        private Period GetPracticPeriod(Period period, string role)
         {
-            Period realPeriod = new Period
+            if (role == Constants.LecturerRole)
+            {
+                return new Period
+                (
+                    period.Day,
+                    period.Semester,
+                    period.StartTime,
+                    period.EndTime + (LecturePoints / LectureParts) - 1
+                );
+            }
+            return new Period
             (
                 period.Day,
                 period.Semester,
                 period.StartTime,
-                period.EndTime + (LecturePoints / LectureParts) - 1
+                period.EndTime + TAPoints - 1
             );
+        }
+
+        public UniStaff? FindStaff(Period period, string role)
+        {
+            Period realPeriod = GetPracticPeriod(period, role);
             foreach (var employee in CourseStaff)
             {
                 if (employee.IsSomeRole(this, role))
@@ -174,13 +194,30 @@ namespace CourseModel
             return null;
         }
 
-        public bool IsOverlapping(Period period, Dictionary<Course, CourseScheduling> SuperCourses)
+        public bool IsOverlapping(Period period, string role)
         {
-            return false;
+            Period realPeriod = GetPracticPeriod(period, role);
+
+            if (period.IsTheDayEnds())
+            {
+                return false;
+            }
+
+            HashSet<Period> possibleOverlaps = new();
             foreach (var course in NonOverlappingCourses)
             {
-
+                if (null != course.TheUnoverlapableTA)
+                {
+                    possibleOverlaps.Add(course.TheUnoverlapableTA);
+                }
+                foreach (var per in course.TheUnoverlapableLecture)
+                {
+                    possibleOverlaps.Add(per);
+                }
             }
+
+            return realPeriod.IsPeriodOverlap(possibleOverlaps);
         }
+
     }
 }
