@@ -17,7 +17,6 @@ namespace CourseModel
         public Dictionary<string, int> TAOccurrences { get; set; }
         public int TAsAfterLecture { get; set; }
         public int LectureParts { get; set; }
-        public bool IsYearlyClass { get; set; }
 
         // not input
         public List<UniStaff> CourseStaff { get; set; }
@@ -27,17 +26,20 @@ namespace CourseModel
         private Dictionary<Period, List<int>> NonAvailableStudants { get; set; }
         // for using to what lecture group
         private int studentCounter;
-        public int tlo;
+        // total occurrences
+        public int tLo;
+        public int tTAo;
         // map(semster) -> map(course group) -> part that left
         private Dictionary<string, Dictionary<int, int>> progressTableLeactures;
         private Dictionary<string, Dictionary<int, int>> progressTableTAs;
         public List<Period> TheUnoverlapableTimes;
         // how many students are in this course
         private int studentNumber;
+        public bool FirstTAAssigned = false;
 
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
             Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
-            int LectureParts, bool isYearlyClass)
+            int LectureParts)
         {
             LecturePoints = lecturePoints;
             this.TAPoints = TAPoints;
@@ -45,13 +47,13 @@ namespace CourseModel
             this.TAsAfterLecture = TAsAfterLecture;
             this.LectureParts = LectureParts;
             LectureOccurrences = lectureOccurrences;
-            IsYearlyClass = isYearlyClass;
 
             studentNumber = 0;
             studentCounter = 0;
             CourseStaff = new List<UniStaff>();
-            NonOverlappingCourses = new HashSet<Course>();
-            tlo = TotalLectureOccurrences();
+            NonOverlappingCourses = new() { this };
+            tLo = TotalLectureOccurrences();
+            tTAo = TotalTAOccurrences();
 
             NonAvailableStudants = new Dictionary<Period, List<int>>();
             InitNonAvailableStudants();
@@ -59,7 +61,6 @@ namespace CourseModel
             progressTableLeactures = new Dictionary<string, Dictionary<int, int>>();
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
             InitProgressTables();
-            IsYearlyClass = isYearlyClass;
 
             TheUnoverlapableTimes = new List<Period>();
         }
@@ -69,7 +70,7 @@ namespace CourseModel
             foreach (Period period in Constants.AvailablePeriods)
             {
                 var whatStudantsWant = new List<int>();
-                for (int i = 0; i < tlo; i++)
+                for (int i = 0; i < tLo; i++)
                 {
                     whatStudantsWant.Add(0);
                 }
@@ -112,7 +113,7 @@ namespace CourseModel
                 NonAvailableStudants[period][studentCounter]++;
             }
             studentCounter++;
-            studentCounter %= tlo;
+            studentCounter %= tLo;
         }
 
         public void UpdateOverlappingCourses(Major major)
@@ -124,14 +125,8 @@ namespace CourseModel
             }
             foreach (var bundle in major.Bundles[year])
             {
-
                 NonOverlappingCourses.UnionWith(bundle.SampleCourses());
             }
-        }
-
-        public void CleanThisFromOverlappingCourses()
-        {
-            NonOverlappingCourses.Remove(this);
         }
 
         private int TotalLectureOccurrences()
@@ -140,6 +135,16 @@ namespace CourseModel
             foreach (var semester in Constants.Semesters)
             {
                 sum += LectureOccurrences[semester];
+            }
+            return sum;
+        }
+
+        private int TotalTAOccurrences()
+        {
+            int sum = 0;
+            foreach (var semester in Constants.Semesters)
+            {
+                sum += TAOccurrences[semester];
             }
             return sum;
         }
@@ -206,16 +211,20 @@ namespace CourseModel
             return realPeriod.IsPeriodOverlap(possibleOverlaps);
         }
 
-        public bool IsStudentsAvailable(Period period, int occurrencesIndex)
+        public bool IsStudentsAvailable(Period period, int occurrencesIndex, string role)
         {
-            double ratio = studentNumber / (double) tlo;
-            if (NonAvailableStudants[period][occurrencesIndex - 1] > 0.8 * ratio)
+            double ratio = studentNumber / (double)tLo; ;
+            if (role == Constants.TARole)
+            {
+                ratio = studentNumber / (double) tTAo;
+            }
+            if (NonAvailableStudants[period][occurrencesIndex - 1] > 0.7 * ratio)
             {
                 return true;
             }
             foreach (var studentProblems in NonAvailableStudants[period])
             {
-                if (studentProblems < 0.5 * ratio)
+                if (studentProblems < 0.4 * ratio)
                 {
                     return false;
                 }

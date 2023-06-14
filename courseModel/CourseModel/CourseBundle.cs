@@ -26,7 +26,7 @@ namespace CourseModel
             MixArray(indexArray);
             int totalCreditPoints = 0;
             int limit = Math.Min(MinCreditPoints + 2, MaxCreditPoints);
-            HashSet<Course> result = new HashSet<Course>();
+            HashSet<Course> result = new();
             for (int i = 0; totalCreditPoints <= limit; i++)
             {
                 result.Add(Courses[i]);
@@ -37,16 +37,14 @@ namespace CourseModel
 
         public static void MixArray(int[] array)
         {
-            Random random = new Random();
+            Random random = new();
 
             for (int i = array.Length - 1; i > 0; i--)
             {
                 int j = random.Next(0, i + 1);
 
                 // Swap elements at index i and j
-                int temp = array[i];
-                array[i] = array[j];
-                array[j] = temp;
+                (array[j], array[i]) = (array[i], array[j]);
             }
         }
     }
