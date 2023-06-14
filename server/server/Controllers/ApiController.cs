@@ -132,8 +132,8 @@ namespace server.Controllers
         }
 
         [Authorize]
-        [HttpPost("Account/institutionSetup")]
-        public async Task<IActionResult> InstitutionSetup([FromBody] string data)
+        [HttpPost("Account/institutionSetup/{institutionName}")]
+        public async Task<IActionResult> InstitutionSetup(string institutionName, [FromBody] InstitutionSetupViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {

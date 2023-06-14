@@ -49,6 +49,9 @@ export const parseCoursesFileContent = fileContent => {
                 lecture_parts: parseInteger(parts[6], 'lecture_parts'),
                 TA_after_lecture: parts[7] ? parseInteger(parts[7], 'TA_after_lecture') : 0,
             };
+            if (course.lecture_points % course.lecture_parts !== 0) {
+                throw new Error(`lecture points (${course.lecture_points}) is not devisible by lecture parts (${course.lecture_parts})`);
+            }
             parsedCourseIds.add(course.id);
             courses.push(course);
         } catch (error) {
@@ -156,6 +159,7 @@ export const parseStaffFileContent = fileContent => {
     const lines = fileContent.split('\n');
     const staffData = { loneUniStaff: [], multipleUniStaff: [] };
     let currentSection = null;
+    const loneUniStaffIds = new Set();
 
     for (let i = 0; i < lines.length; i++) {
         const trimmed = lines[i].trim();
@@ -171,18 +175,35 @@ export const parseStaffFileContent = fileContent => {
                     if (parts.length !== 3) {
                         throw new Error(`LoneUniStaff: Invalid number of fields, expected 3`);
                     }
+                    // check for duplicate staff id's
+                    const id = parseString(parts[0], 'id');
+                    if (loneUniStaffIds.has(id)) {
+                        throw new Error(`LoneUniStaff: Duplicate Uni staff id ${id}`);
+                    }
+
                     staffData.loneUniStaff.push({
-                        id: parseString(parts[0], 'id'),
+                        id: id,
                         name: parseString(parts[1], 'name'),
                         coursesRolesOccurrences: parseCoursesRolesOccurrences(parts[2])
                     });
+                    loneUniStaffIds.add(id);
                 } else if (currentSection === 'multipleUniStaff') {
                     if (parts.length !== 2) {
                         throw new Error(`MultipleUniStaff: Invalid number of fields, expected 2`);
                     }
+                    // check for duplicate staff id's in multipleUniStaff
+                    const staffList = parts[0].trim().split(';').map(id => parseString(id, "staffList id's"));
+                    if (staffList.length < 2 || new Set(staffList).size !== staffList.length) {
+                        throw new Error(`MultipleUniStaff: Too short or Duplicate staff IDs`);
+                    }
+                    // check for duplicated shared courses
+                    const sharedCourses = parts[1].trim().split(';').map(course => parseString(course, "shared courses list"));
+                    if (sharedCourses.length < 1 || new Set(sharedCourses).size !== sharedCourses.length) {
+                        throw new Error(`MultipleUniStaff: Empty or Duplicate course IDs`);
+                    }
                     staffData.multipleUniStaff.push({
-                        staffList: parts[0].trim().split(';').map(id => parseString(id, "staffList id's")),
-                        sharedCourses: parts[1].trim().split(';').map(course => parseString(course, "shared courses list"))
+                        staffList: staffList,
+                        sharedCourses: sharedCourses
                     });
                 }
             } catch (error) {
@@ -190,8 +211,15 @@ export const parseStaffFileContent = fileContent => {
             }
         }
     }
+    staffData.multipleUniStaff.forEach(mulUniStaff => {
+        mulUniStaff.staffList.forEach(loneUniStaffId => {
+            if (!loneUniStaffIds.has(loneUniStaffId)) {
+                throw new Error(`Uni staff ID '${loneUniStaffId}' from multipleUniStaff ${mulUniStaff} does not exist`);
+            }
+        })
+    })
     return staffData;
-    // todo check for duplicates
+    // todo check for courses id validity
 };
 
 const parseCoursesRolesOccurrences = coursesRolesOccurrences => {

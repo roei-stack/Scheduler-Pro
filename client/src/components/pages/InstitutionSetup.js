@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import './InstitutionSetup.css';
 import TextGenerate from '../TextGenerate';
 import Button from '../Button';
@@ -28,6 +28,12 @@ function InstitutionSetup() {
     const [dataLists, setDataLists] = useState({});
     const [fetchState, setFetchState] = useState(FETCH_STATES.UNINITIALIZED);
     const nameRef = useRef();
+
+    useEffect(() => {
+        if (currentStage === STAGES + 1) {
+            handleDataFetch();
+        }
+    }, [currentStage])
 
     const handleInstitutionNameCheck = () => {
         if (finishedStage(1)) return;
@@ -65,9 +71,6 @@ function InstitutionSetup() {
         // file upload stages start from stage 2, and array indices start from 0
         const index = currentStage - 2;
         saveData(index, data);
-        if (currentStage >= STAGES) {
-            handleDataFetch();
-        }
         setCurrentStage(currentStage + 1);
     }
 
@@ -75,26 +78,69 @@ function InstitutionSetup() {
 
     const isFinishedAllStages = () => currentStage === STAGES + 1;
 
-    const handleDataFetch = () => {
+    const handleDataFetch = () => { 
         setFetchState(FETCH_STATES.FETCHING);
-        fetch(`${SERVER}/Account/institutionSetup`, {
+        try {
+            validateData();
+        } catch (error) {
+            notifyError(`Parsing Error: ${error.message}. Refresh and try again`);
+            setFetchState(FETCH_STATES.FAIL);
+            return;
+        }
+        fetch(`${SERVER}/Account/institutionSetup/${nameRef.current.value}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(nameRef.current.value)
+            body: JSON.stringify({ 
+                courseList: dataLists[0],
+                loneUniStaffList: dataLists[1].loneUniStaff,
+                multipleUniStaffList: dataLists[1].multipleUniStaff,
+                courseBundlesList: dataLists[2].courseBundles,
+                majorList: dataLists[2].majors
+            })
         }).then(response => {
             if (response.ok) {
                 return response.json();
             } else {
-                setFetchState(FETCH_STATES.FAIL);
                 throw new Error('Error here...');
             }
         }).then(data => {
             setFetchState(FETCH_STATES.SUCCESS);
             setTimeout(() => handleDoneSetup(data.token), 1250);
-        }).catch(error => notifyError(error.message));
+        }).catch(error => {
+            notifyError(error.message)
+            setFetchState(FETCH_STATES.FAIL);
+        });
+    }
+
+    const validateData = () => {
+        const courseList = dataLists[0];
+        const staffList = dataLists[1];
+        const majorsList = dataLists[2];
+        const courseIds = courseList.map(item => item.id);
+
+        const loneUniStaffCourseIds = staffList.loneUniStaff.map(item => Object.keys(item.coursesRolesOccurrences)).flat();
+        for (const id of loneUniStaffCourseIds) {
+            if (!courseIds.includes(id)) {
+                throw new Error(`Staff: course ${id} shows up in loneUniStaff, but it does not exist`);
+            }
+        }
+
+        const multipleUniStaffCourseIds = staffList.multipleUniStaff.map(item => item.sharedCourses).flat();
+        for (const id of multipleUniStaffCourseIds) {
+            if (!courseIds.includes(id)) {
+                throw new Error(`Staff: course ${id} shows up in multipleUniStaff, but it does not exist`);
+            }
+        }
+
+        const majorsCourseBundlesIds = majorsList.courseBundles.map(item => item.courses).flat();
+        for (const id of majorsCourseBundlesIds) {
+            if (!courseIds.includes(id)) {
+                throw new Error(`Majors: course ${id} shows up in courseBundles, but it does not exist`);
+            }
+        }
     }
 
     return (
