@@ -8,15 +8,15 @@ namespace CourseModel
 {
     public class CourseBundle
     {
+        public string ID { get; set; }
         public int MinCreditPoints { get; set; }
         public int MaxCreditPoints { get; set; }
         public List<Course> Courses { get; set; }
-        public int Year { get; set; }
 
-        public CourseBundle(int year, List<Course> courses)
+        public CourseBundle(string id, List<Course> courses)
         {
+            ID = id;
             Courses = courses;
-            Year = year;
         }
 
         public HashSet<Course> SampleCourses()

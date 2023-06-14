@@ -20,5 +20,28 @@ namespace CourseModel
             StartTime = startTime;
             EndTime = endTime;
         }
+
+        public bool IsPeriodOverlap(IEnumerable<Period> periods)
+        {
+            foreach (var period in periods)
+            {
+                // Check if the periods overlap
+                if (Day == period.Day &&
+                    Semester == period.Semester &&
+                    StartTime < period.EndTime &&
+                    EndTime > period.StartTime)
+                {
+                    // Overlapping periods found
+                    return true;
+                }
+            }
+            // No overlapping periods found
+            return false;
+        }
+
+        public bool IsTheDayEnds()
+        {
+            return (EndTime > Constants.MaxHour);
+        }
     }
 }

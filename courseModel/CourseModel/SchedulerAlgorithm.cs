@@ -24,6 +24,7 @@ namespace CourseModel
 
         public void Shchedule()
         {
+            // fisrt make sure that every course has no overlapping
             foreach (var course in SuperCourses.Keys)
             {
                 for (int lecOccu = 0; lecOccu < course.tlo; lecOccu++)
