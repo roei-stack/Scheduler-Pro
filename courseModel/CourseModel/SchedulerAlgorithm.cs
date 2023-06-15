@@ -23,14 +23,14 @@ namespace CourseModel
                 SuperCourses.Add(course, new CourseScheduling(course));
             }
         }
-
+        /*
         public void RunV1()
         {
             // fisrt make sure that every course has group with no overlapping
             List<Course> needToScheduleTA = ScheduleOneForEveryCourse();
             ScheduleFirstTA(needToScheduleTA);
         }
-
+        */
         public void Run()
         {
             ScheduleLectures();
@@ -39,7 +39,38 @@ namespace CourseModel
 
         private void ScheduleRemainingTAs()
         {
-
+            UniStaff? ta;
+            foreach (string semester in Constants.Semesters)
+            {
+                foreach (Course course in SuperCourses.Keys.Where(
+                    course => (course.TAOccurrences[semester] > 0)))
+                {
+                    while (course.TAOccurrences[semester] > 0)
+                    {
+                        foreach (Period period in Constants.AvailablePeriods.Where(
+                                  period => (period.Semester == semester)))
+                        {
+                            ta = course.FindStaff(period, Constants.TARole);
+                            if (ta == null)
+                            {
+                                continue;
+                            }
+                            if (!course.IsStudentsAvailableForTheRemainingTas(period))
+                            {
+                                continue;
+                            }
+                            Period realPeriod = course.GetPracticPeriod(period, Constants.TARole);
+                            if (realPeriod.IsTheDayEnds())
+                            {
+                                continue;
+                            }
+                            Schedule(ta, course, realPeriod, course.currentGroupNumber, Constants.TARole);
+                            course.currentGroupNumber++;
+                            course.TAOccurrences[semester]--;
+                        }
+                    }
+                }
+            }
         }
 
         private void ScheduleLectures()
@@ -66,12 +97,18 @@ namespace CourseModel
                                     otherDays, ref currentPart);
                             if (tryOutput == 2)
                             {
+                                course.LectureOccurrences[semester]--;
+                                course.TAOccurrences[semester]--;
+                                course.currentGroupNumber += 2;
                                 continue;
                             }
                             if (tryOutput == 1)
                             {
                                 TryScheduleLectureThenTA(course, phase, semester, false,
                                     otherDays, ref currentPart);
+                                course.LectureOccurrences[semester]--;
+                                course.TAOccurrences[semester]--;
+                                course.currentGroupNumber += 2;
                                 continue;
                             }
                         }
@@ -87,6 +124,16 @@ namespace CourseModel
                                     ShcheduleStaff(employee, role, false, otherDays,
                                         course, phase, semester, ref currentPart);
                                 }
+                                course.currentGroupNumber++;
+                                if (role == Constants.LecturerRole)
+                                {
+                                    course.LectureOccurrences[semester]--;
+                                }
+                                if (role == Constants.TARole)
+                                {
+                                    course.TAOccurrences[semester]--;
+                                }
+                                
                             }
                             otherDays.Clear();
                         }
@@ -164,7 +211,6 @@ namespace CourseModel
                         course.UpdateUnoverlapableTimes(taPeriod, Constants.TARole, phase);
                         Schedule(ta, course, taPeriod, phase, Constants.TARole);
                         course.TAsAfterLecture--;
-                        course.FirstTAAssigned = true;
                     }
                     // assign
                     otherDays.Add(period.Day);
@@ -224,7 +270,7 @@ namespace CourseModel
             }
             return false;
         }
-
+        /*
         private void AssignSpecificTA(Course course, bool studentsImportant)
         {
             foreach (var period in Constants.AvailablePeriods)
@@ -250,7 +296,8 @@ namespace CourseModel
                 break;
             }
         }
-
+        */
+        /*
         private void ScheduleFirstTA(List<Course> needToScheduleTA)
         {
             foreach (var course in needToScheduleTA)
@@ -266,7 +313,7 @@ namespace CourseModel
                 }
             }
         }
-
+        */
         private static void InputParser(InstitutionInput input)
         {
             foreach (var course in input.CourseList)
@@ -291,7 +338,7 @@ namespace CourseModel
                 }
             }
         }
-
+        /*
         private List<Course> ScheduleOneForEveryCourse()
         {
             int lecParts;
@@ -387,7 +434,7 @@ namespace CourseModel
                 }
             }
         }
-
+        */
         private void Schedule(UniStaff staff, Course course, Period period, int groupNum, string role)
         {
             staff.Schedule(course, role, period);

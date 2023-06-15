@@ -27,6 +27,7 @@ namespace CourseModel
         // total occurrences
         public int tLo;
         public int tTAo;
+        public int currentGroupNumber = 1;
         /*
         // map(semster) -> map(course group) -> part that left
         private Dictionary<string, Dictionary<int, int>> progressTableLeactures;
@@ -36,7 +37,6 @@ namespace CourseModel
         private Dictionary<int, HashSet<Course>> NonOverlappingCourses { get; set; }
         // how many students are in this course
         private int studentNumber;
-        public bool FirstTAAssigned = false;
         // map(semester) -> max phase
         public static Dictionary<string, int> MaxPhase;
 
@@ -269,20 +269,62 @@ namespace CourseModel
 
         public bool IsStudentsAvailable(Period period, int occurrencesIndex, string role)
         {
-            double ratio = studentNumber / (double) tLo; ;
+            double ratio = studentNumber / (double)tLo;
+            int addition = LecturePoints;
             if (role == Constants.TARole)
             {
-                ratio = studentNumber / (double) tTAo;
+                ratio = studentNumber / (double)tTAo;
+                addition = TAPoints;
             }
-            if (NonAvailableStudants[period][occurrencesIndex - 1] < 0.3 * ratio)
+            List<Period> periods = new() { period };
+            for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
+            {
+                periods.Add(new Period(period.Day, period.Semester, i, i + 1));
+            }
+
+            bool flag = true;
+            foreach (Period per in periods)
+            {
+                if (NonAvailableStudants[per][occurrencesIndex - 1] > 0.3 * ratio)
+                {
+                    flag = false;
+                }
+            }
+            if (flag)
             {
                 return true;
             }
-            foreach (var studentProblems in NonAvailableStudants[period])
+            foreach (Period per in periods)
             {
-                if (studentProblems > 0.6 * ratio)
+                foreach (var studentProblems in NonAvailableStudants[per])
                 {
-                    return false;
+                    if (studentProblems > 0.6 * ratio)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public bool IsStudentsAvailableForTheRemainingTas(Period period)
+        {
+            double ratio = studentNumber / (double) tTAo;
+            int addition = TAPoints;
+            List<Period> periods = new() { period };
+            for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
+            {
+                periods.Add(new Period(period.Day, period.Semester, i, i + 1));
+            }
+
+            foreach (Period per in periods)
+            {
+                foreach (var studentProblems in NonAvailableStudants[per])
+                {
+                    if (studentProblems > 0.8 * ratio)
+                    {
+                        return false;
+                    }
                 }
             }
             return true;

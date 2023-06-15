@@ -18,6 +18,7 @@ namespace CourseModel
         public static readonly string OverlapSuccess = "Yey";
         public static readonly int MinHour = 9;
         public static readonly int MaxHour = 22;
+        public static readonly int MaxDay = 5;
         public static List<Period> AvailablePeriods;
 
         static Constants()
@@ -27,7 +28,7 @@ namespace CourseModel
             foreach (var semester in Semesters)
             {
                 // Initialize with one-hour periods for each hour in the week
-                for (int day = 1; day <= 6; day++)
+                for (int day = 1; day <= MaxDay; day++)
                 {
                     for (int hour = MinHour; hour < MaxHour; hour++)
                     {
