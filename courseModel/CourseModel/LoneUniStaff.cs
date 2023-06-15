@@ -19,6 +19,13 @@ namespace CourseModel
         // map(course) -> map(role) -> course parts for the round
         private Dictionary<Course, int> CoursesLectureParts { get; set; }
 
+        public LoneUniStaff(string id, string name, Dictionary<Course, Dictionary<string, int>> coursesRolesOccurrences)
+        {
+            this.ID = id;
+            this.Name = name;
+            this.CoursesRolesOccurrences = coursesRolesOccurrences;
+        }
+
         public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
             Dictionary<string, int>> coursesRolesOccurrences)
         {

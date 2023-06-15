@@ -13,7 +13,7 @@ namespace CourseModel
         public List<UniStaff> Staff { get; set; }
         public List<Major> Majors { get; set; }
         public List<Student> Students { get; set; }
-        public InstitutionInput(string? institutionName, List<Course> courseList, 
+        public InstitutionInput(string? institutionName, List<Course> courseList,
             List<UniStaff> staff, List<Student> students, List<Major> majors)
         {
             InstitutionName = institutionName;

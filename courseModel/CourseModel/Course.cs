@@ -45,6 +45,19 @@ namespace CourseModel
             MaxPhase = new Dictionary<string, int>();
         }
 
+        public Course(string CourseId, string CourseName, int LecturePoints, int TAPoints,
+                Dictionary<string, int> LectureOccurrences,
+                Dictionary<string, int> TAOccurrences, int TAsAfterLecture, int LectureParts)
+        {
+            this.CourseId = CourseId;
+            this.CourseName = CourseName;
+            this.LecturePoints = LecturePoints;
+            this.TAPoints = TAPoints;
+            this.LectureOccurrences = LectureOccurrences;
+            this.TAOccurrences = TAOccurrences;
+            this.TAsAfterLecture = TAsAfterLecture;
+            this.LectureParts = LectureParts;
+        }
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
             Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
             int LectureParts)

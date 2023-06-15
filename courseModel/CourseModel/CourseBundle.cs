@@ -18,7 +18,13 @@ namespace CourseModel
             ID = id;
             Courses = courses;
         }
-
+        public CourseBundle(string id, int minCreditPoints, int maxCreditPoints, List<Course> courses)
+        {
+            ID = id;
+            MinCreditPoints = minCreditPoints;
+            MaxCreditPoints = maxCreditPoints;
+            Courses = courses;
+        }
         public HashSet<Course> SampleCourses(int phase)
         {
             int len = Courses.Count;

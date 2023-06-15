@@ -21,7 +21,7 @@ namespace CourseModel
         {
             foreach (var staff in UniStaffList)
             {
-                if(!staff.IsPeriodAvailable(period))
+                if (!staff.IsPeriodAvailable(period))
                 {
                     return false;
                 }
