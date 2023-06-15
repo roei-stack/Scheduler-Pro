@@ -4716,8 +4716,8 @@
     },
     "CourseModel/1.0.0": {
       "type": "project",
-      "path": "../../../server_code/CourseModel/CourseModel/CourseModel.csproj",
-      "msbuildProject": "../../../server_code/CourseModel/CourseModel/CourseModel.csproj"
+      "path": "../CourseModel/CourseModel.csproj",
+      "msbuildProject": "../CourseModel/CourseModel.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -4761,8 +4761,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\server_code\\CourseModel\\CourseModel\\CourseModel.csproj": {
-              "projectPath": "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\server_code\\CourseModel\\CourseModel\\CourseModel.csproj"
+            "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\gitIT\\server\\CourseModel\\CourseModel.csproj": {
+              "projectPath": "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\gitIT\\server\\CourseModel\\CourseModel.csproj"
             }
           }
         }

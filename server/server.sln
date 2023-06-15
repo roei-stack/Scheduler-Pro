@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "server", "server\server.csproj", "{7DE14748-0EFD-43D9-AAC5-86D2FDF3762A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourseModel", "..\..\server_code\CourseModel\CourseModel\CourseModel.csproj", "{ECAD99DB-2264-4596-A0DB-6C00F47BAC9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseModel", "CourseModel\CourseModel.csproj", "{89678123-1082-47BE-8E99-DE64C30FB2AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{7DE14748-0EFD-43D9-AAC5-86D2FDF3762A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE14748-0EFD-43D9-AAC5-86D2FDF3762A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DE14748-0EFD-43D9-AAC5-86D2FDF3762A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ECAD99DB-2264-4596-A0DB-6C00F47BAC9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ECAD99DB-2264-4596-A0DB-6C00F47BAC9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ECAD99DB-2264-4596-A0DB-6C00F47BAC9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ECAD99DB-2264-4596-A0DB-6C00F47BAC9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89678123-1082-47BE-8E99-DE64C30FB2AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89678123-1082-47BE-8E99-DE64C30FB2AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89678123-1082-47BE-8E99-DE64C30FB2AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89678123-1082-47BE-8E99-DE64C30FB2AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,12 @@
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\bin\Debug\net6.0\CourseModel.deps.json
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\bin\Debug\net6.0\CourseModel.dll
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\bin\Debug\net6.0\CourseModel.pdb
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.csproj.AssemblyReference.cache
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.AssemblyInfoInputs.cache
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.AssemblyInfo.cs
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.csproj.CoreCompileInputs.cache
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.dll
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\refint\CourseModel.dll
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\CourseModel.pdb
+C:\Users\eitha\Desktop\איתן\בר אילן אוניברסיטה\שנים\שנה ג\פרויקט שנתי\gitIT\server\CourseModel\obj\Debug\net6.0\ref\CourseModel.dll
