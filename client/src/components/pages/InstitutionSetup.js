@@ -104,13 +104,13 @@ function InstitutionSetup() {
             if (response.ok) {
                 return response.json();
             } else {
-                throw new Error('Error here...');
+                throw new Error(`server returned status code ${response.status}. Refresh and try again`);
             }
         }).then(data => {
             setFetchState(FETCH_STATES.SUCCESS);
             setTimeout(() => handleDoneSetup(data.token), 1250);
         }).catch(error => {
-            notifyError(error.message)
+            notifyError(error.message);
             setFetchState(FETCH_STATES.FAIL);
         });
     }
@@ -192,10 +192,6 @@ function InstitutionSetup() {
                             {' ' + fetchState.text}
                         </div>
                     }
-                    <button onClick={() => { setFetchState(FETCH_STATES.UNINITIALIZED) }}>UNINITIALIZED</button>
-                    <button onClick={() => { setFetchState(FETCH_STATES.FETCHING) }}>FETCHING</button>
-                    <button onClick={() => { setFetchState(FETCH_STATES.SUCCESS) }}>SUCCESS</button>
-                    <button onClick={() => { setFetchState(FETCH_STATES.FAIL) }}>FAIL</button>
                 </div>
             </div>
         </section>

@@ -209,16 +209,72 @@ namespace server.Controllers
         [HttpGet("checkFormId/{formId}")]
         public IActionResult CheckFormId(string formId)
         {
-            var i = dbContext.InstitutionsData.Find("biu");
-            if (dbContext.InstitutionsData.Any(i => i.StudentFormId == formId))
+            var institutionData = dbContext.InstitutionsData.FirstOrDefault(i => i.StudentFormId == formId);
+            if (institutionData != null)
             {
-                return Ok( new { formType = "student" } );
+                return Ok( new 
+                { 
+                    formType = "student",
+                    courseIds = institutionData.FromJson()?.CourseList?.Select(course => course.Id).ToList()
+                });
             }
-            if (dbContext.InstitutionsData.Any(i => i.StaffFormId == formId))
+
+            institutionData = dbContext.InstitutionsData.FirstOrDefault(i => i.StaffFormId == formId);
+            if (institutionData != null)
             {
-                return Ok(new { formType = "staff" });
+                return Ok(new 
+                { 
+                    formType = "staff",
+                    courseIds = institutionData.FromJson()?.CourseList?.Select(course => course.Id).ToList()
+                });
             }
             return BadRequest();
+        }
+
+        [HttpPost("submitStaffForm/{formId}/{staffId}")]
+        public IActionResult SubmitStaffForm(string formId, string staffId, [FromBody] List<Period> periods)
+        {
+            // search the form id
+            var institutionData = dbContext.InstitutionsData.FirstOrDefault(item => item.StaffFormId == formId);
+            if (institutionData == null)
+            {
+                return BadRequest();
+            }
+            InstitutionSetupViewModel? vm = institutionData.FromJson();
+            if (vm == null)
+            {
+                return StatusCode(500);
+            }
+            if (vm.LoneUniStaffList == null || !vm.LoneUniStaffList.Any(item => item.Id == staffId))
+            {
+                return BadRequest();
+            }
+            var input = new StaffFormInput { StaffId = staffId, InstitutionUsername = institutionData.Username };
+            input.SetUnavilableTimes(periods);
+            this.dbContext.StaffFormInputs.Add(input);
+            this.dbContext.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost("submitStudentForm/{formId}/{studentId}")]
+        public IActionResult SubmitStudentForm(string formId, string studentId, StudentFormViewModel viewModel)
+        {
+            // search the form id
+            var institutionData = dbContext.InstitutionsData.FirstOrDefault(item => item.StudentFormId == formId);
+            if (institutionData == null)
+            {
+                return BadRequest();
+            }
+            var input = new StudentFormInput
+            {
+                StudentId = studentId,
+                InstitutionUsername = institutionData.Username,
+            };
+            input.SetUnavilableTimes(viewModel.UnavailableTimes);
+            input.SetCourseIds(viewModel.CourseIds);
+            this.dbContext.StudentFormInputs.Add(input);
+            this.dbContext.SaveChangesAsync();
+            return Ok();
         }
 
         private string RefreshToken(User user)

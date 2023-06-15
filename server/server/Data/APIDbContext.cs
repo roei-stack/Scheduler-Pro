@@ -11,5 +11,9 @@ namespace server.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<InstitutionData> InstitutionsData { get; set; }
+
+        public DbSet<StaffFormInput> StaffFormInputs { get; set; }
+
+        public DbSet<StudentFormInput> StudentFormInputs { get; set; }
     }
 }

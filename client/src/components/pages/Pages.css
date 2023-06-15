@@ -30,6 +30,10 @@
     background-image: url('/public/images/img-3.jpg');
 }
 
+.box-container {
+    width: 100%;
+}
+
 .account-setup {
     background-image: url('/public/images/img-2.jpg');
 }

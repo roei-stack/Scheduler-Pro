@@ -7,7 +7,7 @@ import './Account.css';
 
 function InstitutionAccount() {
   const [formsIds, setFormsIds] = useState({staffFormId: '', studentFormId: ''});
-  const { token } = useContext(AuthContext);
+  const { username, token } = useContext(AuthContext);
   const isMountedRef = useRef(false);
 
   useEffect(() => {
@@ -39,6 +39,7 @@ function InstitutionAccount() {
     <section className='institution-account'>
       <div className='blur-box'>
         <div>
+          Welcome {username}!<br />
           Institution's staff form:<br />
           <Link to={`/form/${formsIds.staffFormId}`}>{`${window.location.origin}/form/${formsIds.staffFormId}`}</Link><br />
           Students' form:<br />

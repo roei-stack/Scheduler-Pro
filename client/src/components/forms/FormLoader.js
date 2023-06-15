@@ -4,12 +4,15 @@ import { SERVER, notifyError } from '../../AuthContextProvider';
 import StaffForm from './StaffForm';
 import StudentForm from './StudentForm';
 import '../pages/Pages.css';
+import './forms.css';
+import '../pages/InstitutionSetup.css'
 
 function FormLoader() {
     const { formId: urlFormId } = useParams();
     const navigate = useNavigate();
     const isMountedRef = useRef(false);
     const [formType, setFormType] = useState(null);
+    const [courseIds, setCourseIds] = useState([]);
 
     useEffect(() => {
         if (!isMountedRef.current) {
@@ -29,8 +32,10 @@ function FormLoader() {
             } else {
                 throw new Error('Form not found');
             }
-        }).then(data => setFormType(data.formType))
-            .catch(error => {
+        }).then(data => {
+            setFormType(data.formType);
+            setCourseIds(data.courseIds);
+        }).catch(error => {
                 notifyError(error.message);
                 navigate('/404-form-not-found');
             });
@@ -39,7 +44,9 @@ function FormLoader() {
     return (
         <div className='form'>
             <div className='blur-box'>
-                {formType === 'staff' ? <StaffForm /> : <StudentForm />}
+                <div className='box-container'>
+                    {formType === 'staff' ? <StaffForm /> : <StudentForm courseIds={courseIds}/>}
+                </div>
             </div>
         </div>
     );
