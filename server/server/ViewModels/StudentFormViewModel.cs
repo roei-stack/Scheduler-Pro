@@ -1,4 +1,5 @@
-﻿using server.Models;
+﻿using CourseModel;
+using server.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace server.ViewModels

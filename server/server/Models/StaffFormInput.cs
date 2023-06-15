@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CourseModel;
+using System.ComponentModel.DataAnnotations;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+
 
 namespace server.Models
 {

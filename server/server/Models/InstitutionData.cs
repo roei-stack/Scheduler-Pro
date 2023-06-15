@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CourseModel;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using server.ViewModels;
 using System.ComponentModel.DataAnnotations;

@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "server/1.0.0": {
         "dependencies": {
+          "CourseModel": "1.0.0",
           "Google.Apis.Auth": "1.60.0",
           "Google.Apis.Auth.Mvc": "1.60.0",
           "Google.Apis.Forms.v1": "1.60.0.2807",
@@ -1174,6 +1175,11 @@
             "fileVersion": "5.0.20.51904"
           }
         }
+      },
+      "CourseModel/1.0.0": {
+        "runtime": {
+          "CourseModel.dll": {}
+        }
       }
     }
   },
@@ -1945,6 +1951,11 @@
       "sha512": "sha512-c1ho9WU9ZxMZawML+ssPKZfdnrg/OjR3pe0m9v8230z3acqphwvPJqzAkH54xRYm5ntZHGG1EPP3sux9H3qSPg==",
       "path": "system.windows.extensions/5.0.0",
       "hashPath": "system.windows.extensions.5.0.0.nupkg.sha512"
+    },
+    "CourseModel/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
