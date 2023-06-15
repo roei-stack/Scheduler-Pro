@@ -13,7 +13,7 @@ namespace CourseModel
         public static readonly string TARole = "TA";
         public static readonly string[] Roles = {LecturerRole, TARole};
         public static readonly string Lecture = "lecture";
-        public static readonly string TA = "TA";
+        public static readonly string Exercise = "exercise";
         public static readonly string OverlapFail = "Failed to prevent overlapping, you can cry or change the bundles. Your call";
         public static readonly string OverlapSuccess = "Yey";
         public static readonly int MinHour = 9;
