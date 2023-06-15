@@ -99,7 +99,7 @@ namespace CourseModel
                             {
                                 course.LectureOccurrences[semester]--;
                                 course.TAOccurrences[semester]--;
-                                course.currentGroupNumber += 2;
+                                course.currentGroupNumber++;
                                 continue;
                             }
                             if (tryOutput == 1)
@@ -108,7 +108,7 @@ namespace CourseModel
                                     otherDays, ref currentPart);
                                 course.LectureOccurrences[semester]--;
                                 course.TAOccurrences[semester]--;
-                                course.currentGroupNumber += 2;
+                                course.currentGroupNumber++;
                                 continue;
                             }
                         }
@@ -124,13 +124,13 @@ namespace CourseModel
                                     ShcheduleStaff(employee, role, false, otherDays,
                                         course, phase, semester, ref currentPart);
                                 }
-                                course.currentGroupNumber++;
                                 if (role == Constants.LecturerRole)
                                 {
                                     course.LectureOccurrences[semester]--;
                                 }
                                 if (role == Constants.TARole)
                                 {
+                                    course.currentGroupNumber++;
                                     course.TAOccurrences[semester]--;
                                 }
                                 
