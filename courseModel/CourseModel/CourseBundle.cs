@@ -19,13 +19,13 @@ namespace CourseModel
             Courses = courses;
         }
 
-        public HashSet<Course> SampleCourses()
+        public HashSet<Course> SampleCourses(int phase)
         {
             int len = Courses.Count;
             int[] indexArray = Enumerable.Range(0, len).ToArray();
             MixArray(indexArray);
             int totalCreditPoints = 0;
-            int limit = Math.Min(MinCreditPoints + 2, MaxCreditPoints);
+            int limit = Math.Min(MinCreditPoints + 3 - phase, MaxCreditPoints);
             HashSet<Course> result = new();
             for (int i = 0; totalCreditPoints <= limit; i++)
             {

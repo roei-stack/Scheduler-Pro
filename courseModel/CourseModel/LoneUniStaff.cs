@@ -16,12 +16,23 @@ namespace CourseModel
         // institution's input
         // map(course) -> map(role) -> course ocurrences
         public Dictionary<Course, Dictionary<string, int>> CoursesRolesOccurrences { get; set; }
+        // map(course) -> map(role) -> course parts for the round
+        private Dictionary<Course, int> CoursesLectureParts { get; set; }
 
         public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
             Dictionary<string, int>> coursesRolesOccurrences)
         {
             UnavailableTimes = unavailableTimes;
             CoursesRolesOccurrences = coursesRolesOccurrences;
+
+            CoursesLectureParts = new Dictionary<Course, int>();
+            foreach (Course course in CoursesRolesOccurrences.Keys)
+            {
+                if (CoursesRolesOccurrences[course].ContainsKey(Constants.LecturerRole))
+                {
+                    CoursesLectureParts[course] = course.LectureParts;
+                }
+            }
         }
 
         public bool IsPeriodAvailable(Period period)
@@ -48,7 +59,19 @@ namespace CourseModel
 
         public void Schedule(Course course, string role, Period period)
         {
-            CoursesRolesOccurrences[course][role]--;
+            if (role == Constants.LecturerRole)
+            {
+                CoursesLectureParts[course]--;
+                if (0 == CoursesLectureParts[course])
+                {
+                    CoursesRolesOccurrences[course][role]--;
+                    CoursesLectureParts[course] = course.LectureParts;
+                }
+            }
+            if (role == Constants.TARole)
+            {
+                CoursesRolesOccurrences[course][role]--;
+            }
             UnavailableTimes.Add(period);
         }
     }

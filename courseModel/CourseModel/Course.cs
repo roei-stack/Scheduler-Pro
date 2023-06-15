@@ -21,21 +21,29 @@ namespace CourseModel
         // not input
         public List<UniStaff> CourseStaff { get; set; }
         // not input
-        private HashSet<Course> NonOverlappingCourses { get; set; }
-        // not input
         private Dictionary<Period, List<int>> NonAvailableStudants { get; set; }
         // for using to what lecture group
         private int studentCounter;
         // total occurrences
         public int tLo;
         public int tTAo;
+        /*
         // map(semster) -> map(course group) -> part that left
         private Dictionary<string, Dictionary<int, int>> progressTableLeactures;
-        private Dictionary<string, Dictionary<int, int>> progressTableTAs;
-        public List<Period> TheUnoverlapableTimes;
+        private Dictionary<string, Dictionary<int, int>> progressTableTAs;*/
+        // map(phase) -> UnoverlapableTimes / NonOverlappingCourses
+        public Dictionary<int, List<Period>> TheUnoverlapableTimes;
+        private Dictionary<int, HashSet<Course>> NonOverlappingCourses { get; set; }
         // how many students are in this course
         private int studentNumber;
         public bool FirstTAAssigned = false;
+        // map(semester) -> max phase
+        public static Dictionary<string, int> MaxPhase;
+
+        static Course()
+        {
+            MaxPhase = new Dictionary<string, int>();
+        }
 
         public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
             Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
@@ -51,18 +59,37 @@ namespace CourseModel
             studentNumber = 0;
             studentCounter = 0;
             CourseStaff = new List<UniStaff>();
-            NonOverlappingCourses = new() { this };
             tLo = TotalLectureOccurrences();
+
+            foreach (string semester in Constants.Semesters)
+            {
+                if (LectureOccurrences[semester] > MaxPhase[semester])
+                {
+                    MaxPhase[semester] = LectureOccurrences[semester];
+                }
+            }
+
             tTAo = TotalTAOccurrences();
 
             NonAvailableStudants = new Dictionary<Period, List<int>>();
             InitNonAvailableStudants();
-
+            /*
             progressTableLeactures = new Dictionary<string, Dictionary<int, int>>();
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
-            InitProgressTables();
+            InitProgressTables();*/
 
-            TheUnoverlapableTimes = new List<Period>();
+            NonOverlappingCourses = new Dictionary<int, HashSet<Course>>();
+            TheUnoverlapableTimes = new Dictionary<int, List<Period>>();
+            InitOverlappingPhases();
+        }
+
+        private void InitOverlappingPhases()
+        {
+            for (int phase = 1; phase <= tLo; phase++)
+            {
+                NonOverlappingCourses[phase] = new HashSet<Course>() { this };
+                TheUnoverlapableTimes[phase] = new List<Period>();
+            }
         }
 
         private void InitNonAvailableStudants()
@@ -77,7 +104,7 @@ namespace CourseModel
                 NonAvailableStudants.Add(period, whatStudantsWant);
             }
         }
-
+        /*
         private void InitProgressTables()
         {
             foreach (var semester in Constants.Semesters)
@@ -93,7 +120,7 @@ namespace CourseModel
                     progressTableTAs[semester][i] = 1;
                 }
             }
-        }
+        }*/
 
         public override string ToString()
         {
@@ -123,9 +150,12 @@ namespace CourseModel
             {
                 return;
             }
-            foreach (var bundle in major.Bundles[year])
+            for (int phase = 1; phase <= tLo; phase++)
             {
-                NonOverlappingCourses.UnionWith(bundle.SampleCourses());
+                foreach (var bundle in major.Bundles[year])
+                {
+                    NonOverlappingCourses[phase].UnionWith(bundle.SampleCourses(phase));
+                }
             }
         }
 
@@ -191,7 +221,32 @@ namespace CourseModel
             return null;
         }
 
-        public bool IsOverlapping(Period period, string role)
+        public List<UniStaff> GetAllByRole(string role)
+        {
+            List<UniStaff> list = new();
+            foreach (var employee in CourseStaff)
+            {
+                if (employee.IsSomeRole(this, role))
+                {
+                    list.Add(employee);
+                }
+            }
+            return list;
+        }
+
+        public UniStaff? GetByRole(string role)
+        {
+            foreach (UniStaff employee in CourseStaff)
+            {
+                if (employee.IsSomeRole(this, role))
+                {
+                    return employee;
+                }
+            }
+            return null;
+        }
+
+        public bool IsOverlapping(Period period, string role, int phase)
         {
             Period realPeriod = GetPracticPeriod(period, role);
 
@@ -201,30 +256,31 @@ namespace CourseModel
             }
 
             HashSet<Period> possibleOverlaps = new();
-            foreach (var course in NonOverlappingCourses)
+            foreach (var course in NonOverlappingCourses[phase])
             {
-                foreach (var per in course.TheUnoverlapableTimes)
+                foreach (var per in course.TheUnoverlapableTimes[phase])
                 {
                     possibleOverlaps.Add(per);
                 }
             }
+            // can improve by saving possibleOverlaps
             return realPeriod.IsPeriodOverlap(possibleOverlaps);
         }
 
         public bool IsStudentsAvailable(Period period, int occurrencesIndex, string role)
         {
-            double ratio = studentNumber / (double)tLo; ;
+            double ratio = studentNumber / (double) tLo; ;
             if (role == Constants.TARole)
             {
                 ratio = studentNumber / (double) tTAo;
             }
-            if (NonAvailableStudants[period][occurrencesIndex - 1] > 0.7 * ratio)
+            if (NonAvailableStudants[period][occurrencesIndex - 1] < 0.3 * ratio)
             {
                 return true;
             }
             foreach (var studentProblems in NonAvailableStudants[period])
             {
-                if (studentProblems < 0.4 * ratio)
+                if (studentProblems > 0.6 * ratio)
                 {
                     return false;
                 }
@@ -232,12 +288,12 @@ namespace CourseModel
             return true;
         }
 
-        public void UpdateUnoverlapableTimes(Period period, string role)
+        public void UpdateUnoverlapableTimes(Period period, string role, int phase)
         {
             Period practicPeriod = GetPracticPeriod(period, role);
-            TheUnoverlapableTimes.Add(practicPeriod);
+            TheUnoverlapableTimes[phase].Add(practicPeriod);
         }
-
+        /*
         public void UpdateProgress(string semester, string role, int groupNum)
         {
             if (role == Constants.LecturerRole)
@@ -248,6 +304,6 @@ namespace CourseModel
             {
                 progressTableTAs[semester][groupNum]--;
             }
-        }
+        }*/
     }
 }
