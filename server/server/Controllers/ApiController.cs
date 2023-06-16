@@ -341,6 +341,7 @@ namespace server.Controllers
             schedulerAlgorithm.Run();
             Console.WriteLine(schedulerAlgorithm.AlgorithmMessage);
 
+            // todo cleanup
             return Ok();
         }
 

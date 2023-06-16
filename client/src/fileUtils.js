@@ -90,9 +90,9 @@ const parseDictionary = (dictionaryString, fieldName, id) => {
             throw new Error(`Negative value '${dictionaryString}' found for feild ${fieldName}`);
         }
         return {
-            A: occurrences,
-            B: occurrences,
-            Summer: occurrences,
+            a: occurrences,
+            b: occurrences,
+            summer: occurrences,
         };
     }
     try {
