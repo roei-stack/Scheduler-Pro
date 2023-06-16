@@ -16,12 +16,13 @@ namespace CourseModel
         {
             AlgorithmMessage = Constants.OverlapSuccess;
             Input = input;
-            InputParser(input);
             SuperCourses = new Dictionary<Course, CourseScheduling>();
             foreach (var course in input.CourseList)
             {
+                course.InitCourse();
                 SuperCourses.Add(course, new CourseScheduling(course));
             }
+            InputParser(input);
         }
         /*
         public void RunV1()

@@ -44,6 +44,10 @@ namespace CourseModel
         static Course()
         {
             MaxPhase = new Dictionary<string, int>();
+            foreach (string semester in Constants.Semesters)
+            {
+                MaxPhase[semester] = 0;
+            }
         }
 
         public Course(string CourseId, string CourseName, int LecturePoints, int TAPoints,
@@ -59,17 +63,8 @@ namespace CourseModel
             this.TAsAfterLecture = TAsAfterLecture;
             this.LectureParts = LectureParts;
         }
-        public Course(int lecturePoints, int TAPoints, Dictionary<string, int> lectureOccurrences,
-            Dictionary<string, int> TAOccurrences, int TAsAfterLecture,
-            int LectureParts)
+        public void InitCourse()
         {
-            LecturePoints = lecturePoints;
-            this.TAPoints = TAPoints;
-            this.TAOccurrences = TAOccurrences;
-            this.TAsAfterLecture = TAsAfterLecture;
-            this.LectureParts = LectureParts;
-            LectureOccurrences = lectureOccurrences;
-
             studentNumber = 0;
             studentCounter = 0;
             CourseStaff = new List<UniStaff>();
@@ -101,6 +96,8 @@ namespace CourseModel
         {
             foreach (string semester in Constants.Semesters)
             {
+                NonOverlappingCourses[semester] = new Dictionary<int, HashSet<Course>>();
+                TheUnoverlapableTimes[semester] = new Dictionary<int, List<Period>>();
                 for (int phase = 1; phase <= LectureOccurrences[semester]; phase++)
                 {
                     NonOverlappingCourses[semester][phase] = new HashSet<Course>() { this };
@@ -152,9 +149,18 @@ namespace CourseModel
         public void UpdateStudentProblems(Student student)
         {
             studentNumber++;
+            if (student.UnavailableTimes == null)
+            {
+                return;
+            }
             foreach (Period period in student.UnavailableTimes)
             {
-                NonAvailableStudants[period][studentCounter]++;
+                for (int hour = period.StartTime; hour < period.EndTime; hour++)
+                {
+                    NonAvailableStudants[
+                        Constants.AvailablePeriodsFromPeriod[(period.Day, period.Semester, hour)]]
+                        [studentCounter]++;
+                }
             }
             studentCounter++;
             studentCounter %= tLo;
@@ -329,7 +335,7 @@ namespace CourseModel
 
         public bool IsStudentsAvailableForTheRemainingTas(Period period)
         {
-            double ratio = studentNumber / (double)tTAo;
+            double ratio = studentNumber / (double) tTAo;
             int addition = TAPoints;
             List<Period> periods = new() { period };
             for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
