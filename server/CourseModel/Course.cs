@@ -33,9 +33,9 @@ namespace CourseModel
         // map(semster) -> map(course group) -> part that left
         private Dictionary<string, Dictionary<int, int>> progressTableLeactures;
         private Dictionary<string, Dictionary<int, int>> progressTableTAs;*/
-        // map(phase) -> UnoverlapableTimes / NonOverlappingCourses
-        public Dictionary<int, List<Period>> TheUnoverlapableTimes;
-        private Dictionary<int, HashSet<Course>> NonOverlappingCourses { get; set; }
+        // map(semester) -> map(phase) -> UnoverlapableTimes / NonOverlappingCourses
+        public Dictionary<string, Dictionary<int, List<Period>>> TheUnoverlapableTimes;
+        private Dictionary<string, Dictionary<int, HashSet<Course>>> NonOverlappingCourses { get; set; }
         // how many students are in this course
         private int studentNumber;
         // map(semester) -> max phase
@@ -92,17 +92,20 @@ namespace CourseModel
             progressTableTAs = new Dictionary<string, Dictionary<int, int>>();
             InitProgressTables();*/
 
-            NonOverlappingCourses = new Dictionary<int, HashSet<Course>>();
-            TheUnoverlapableTimes = new Dictionary<int, List<Period>>();
+            NonOverlappingCourses = new Dictionary<string, Dictionary<int, HashSet<Course>>>();
+            TheUnoverlapableTimes = new Dictionary<string, Dictionary<int, List<Period>>>();
             InitOverlappingPhases();
         }
 
         private void InitOverlappingPhases()
         {
-            for (int phase = 1; phase <= tLo; phase++)
+            foreach (string semester in Constants.Semesters)
             {
-                NonOverlappingCourses[phase] = new HashSet<Course>() { this };
-                TheUnoverlapableTimes[phase] = new List<Period>();
+                for (int phase = 1; phase <= LectureOccurrences[semester]; phase++)
+                {
+                    NonOverlappingCourses[semester][phase] = new HashSet<Course>() { this };
+                    TheUnoverlapableTimes[semester][phase] = new List<Period>();
+                }
             }
         }
 
@@ -164,11 +167,14 @@ namespace CourseModel
             {
                 return;
             }
-            for (int phase = 1; phase <= tLo; phase++)
+            foreach (string semester in Constants.Semesters)
             {
-                foreach (var bundle in major.Bundles[year])
+                for (int phase = 1; phase <= LectureOccurrences[semester]; phase++)
                 {
-                    NonOverlappingCourses[phase].UnionWith(bundle.SampleCourses(phase));
+                    foreach (var bundle in major.Bundles[year])
+                    {
+                        NonOverlappingCourses[semester][phase].UnionWith(bundle.SampleCourses(phase));
+                    }
                 }
             }
         }
@@ -270,9 +276,9 @@ namespace CourseModel
             }
 
             HashSet<Period> possibleOverlaps = new();
-            foreach (var course in NonOverlappingCourses[phase])
+            foreach (var course in NonOverlappingCourses[period.Semester][phase])
             {
-                foreach (var per in course.TheUnoverlapableTimes[phase])
+                foreach (var per in course.TheUnoverlapableTimes[period.Semester][phase])
                 {
                     possibleOverlaps.Add(per);
                 }
@@ -323,7 +329,7 @@ namespace CourseModel
 
         public bool IsStudentsAvailableForTheRemainingTas(Period period)
         {
-            double ratio = studentNumber / (double) tTAo;
+            double ratio = studentNumber / (double)tTAo;
             int addition = TAPoints;
             List<Period> periods = new() { period };
             for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
@@ -347,7 +353,7 @@ namespace CourseModel
         public void UpdateUnoverlapableTimes(Period period, string role, int phase)
         {
             Period practicPeriod = GetPracticPeriod(period, role);
-            TheUnoverlapableTimes[phase].Add(practicPeriod);
+            TheUnoverlapableTimes[period.Semester][phase].Add(practicPeriod);
         }
         /*
         public void UpdateProgress(string semester, string role, int groupNum)
