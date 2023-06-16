@@ -35,6 +35,23 @@ function InstitutionAccount() {
       .catch(error => console.log(error.message));
   }
 
+  const handleSubmit = () => {
+    fetch(`${SERVER}/Account/callInstitutionSchedulingAlgo`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+      },
+  }).then(response => {
+      if (response.ok) {
+          console.log('yay');
+      } else {
+          throw new Error(`status ${response.status}`);
+      }
+  }).catch(error => notifyError(error.message));
+  };
+
+
   return (
     <section className='institution-account'>
       <div className='blur-box'>
@@ -44,7 +61,7 @@ function InstitutionAccount() {
           <Link to={`/form/${formsIds.staffFormId}`}>{`${window.location.origin}/form/${formsIds.staffFormId}`}</Link><br />
           Students' form:<br />
           <Link to={`/form/${formsIds.studentFormId}`}>{`${window.location.origin}/form/${formsIds.studentFormId}`}</Link><br /><br />
-          <Button buttonStyle='btn--outline'>Close forms and submit data</Button>
+          <Button onClick={handleSubmit} buttonStyle='btn--outline'>Close forms and submit data</Button>
         </div>
       </div>
     </section >

@@ -16,6 +16,24 @@ namespace server.Models
 
         public string? CourseIdsJson { get; set; }
 
+        public Student ToStudent(List<Course> courses)
+        {
+            var courseIds = this.GetCourseIds();
+            if (courses == null)
+            {
+                throw new ArgumentNullException();
+            }
+            List<Course> wantedCourses = courses.Where(c => courseIds.Contains(c.CourseId)).ToList();
+            List<Period> unavilableTimes = this.GetUnavilableTimes();
+
+            if (unavilableTimes == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            return new Student(unavilableTimes, wantedCourses);
+        }
+
         public List<Period>? GetUnavilableTimes()
         {
             return JsonSerializer.Deserialize<List<Period>>(UnavilableTimesJson);

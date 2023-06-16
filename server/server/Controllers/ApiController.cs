@@ -278,6 +278,72 @@ namespace server.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost("Account/callInstitutionSchedulingAlgo")]
+        public async Task<IActionResult> CallInstitutionSchedulingAlgo()
+        {
+            // check that user exists as an institution and have done their setup
+            var username = User.FindFirst("username")?.Value;
+            var user = await dbContext.Users.FindAsync(username);
+
+            if (user == null || user.IsInstitution == false || user.NeedSetup == true)
+            {
+                return Unauthorized();
+            }
+
+            // get institution's setup data
+            var institutionData = await this.dbContext.InstitutionsData.FirstOrDefaultAsync(i => i.Username == username);
+            if (institutionData == null)
+            {
+                // we should not be here
+                return StatusCode(500);
+            }
+            InstitutionSetupViewModel? setupViewModel = institutionData.FromJson();
+            if (setupViewModel == null)
+            {
+                return StatusCode(500);
+            }
+            InstitutionInput institutionInput = InstitutionData.BuildInputFromViewModel(institutionData.InstitutionName, setupViewModel);
+            if (institutionInput == null)
+            {
+                return StatusCode(500);
+            }
+            List<StaffFormInput> staffForms = dbContext.StaffFormInputs.Where(item => item.InstitutionUsername == username).ToList();
+            List<StudentFormInput> studentFormInputs = dbContext.StudentFormInputs.Where(item => item.InstitutionUsername == username).ToList();
+
+            // set students
+            List<Student> students;
+            try
+            {
+                students = studentFormInputs.Select(item => item.ToStudent(institutionInput.CourseList)).ToList();
+            } catch (Exception)
+            {
+                return StatusCode(500);
+            }
+            institutionInput.Students = students;
+
+            // set staff prefrences
+            List<LoneUniStaff> loneUniStaff = institutionInput.Staff.OfType<LoneUniStaff>().ToList();
+            foreach (var form in staffForms)
+            {
+                var item = loneUniStaff.FirstOrDefault(s => s.ID == form.StaffId);
+                if (item != null)
+                {
+                    var unavailableTimes = form.GetUnavilableTimes();
+                    if (unavailableTimes != null)
+                    {
+                        item.UnavailableTimes = unavailableTimes;
+                    }
+                }
+            }
+            
+            SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(institutionInput);
+            schedulerAlgorithm.Run();
+            Console.WriteLine(schedulerAlgorithm.AlgorithmMessage);
+
+            return Ok();
+        }
+
         private string RefreshToken(User user)
         {
             var currentExpiration = User.FindFirst("exp")?.Value;
