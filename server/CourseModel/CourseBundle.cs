@@ -12,6 +12,8 @@ namespace CourseModel
         public int MinCreditPoints { get; set; }
         public int MaxCreditPoints { get; set; }
         public List<Course> Courses { get; set; }
+        private int totalCreditPoints = 0;
+        private bool isNotInited = true;
 
         public CourseBundle(string id, List<Course> courses)
         {
@@ -25,15 +27,29 @@ namespace CourseModel
             MaxCreditPoints = maxCreditPoints;
             Courses = courses;
         }
+
+        public void InitBundle()
+        {
+            if (isNotInited)
+            {
+                foreach (Course course in Courses)
+                {
+                    totalCreditPoints += course.CreditPoints();
+                }
+                isNotInited = false;
+            }
+        }
+
         public HashSet<Course> SampleCourses(int phase)
         {
             int len = Courses.Count;
             int[] indexArray = Enumerable.Range(0, len).ToArray();
             MixArray(indexArray);
             int totalCreditPoints = 0;
-            int limit = Math.Min(MinCreditPoints + 3 - phase, MaxCreditPoints);
+            int limit = Math.Min(MinCreditPoints + 4 - phase,
+                Math.Min(MaxCreditPoints, totalCreditPoints));
             HashSet<Course> result = new();
-            for (int i = 0; totalCreditPoints <= limit; i++)
+            for (int i = 0; totalCreditPoints < limit; i++)
             {
                 result.Add(Courses[i]);
                 totalCreditPoints += Courses[i].CreditPoints();

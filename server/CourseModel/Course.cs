@@ -179,6 +179,7 @@ namespace CourseModel
                 {
                     foreach (var bundle in major.Bundles[year])
                     {
+                        bundle.InitBundle();
                         NonOverlappingCourses[semester][phase].UnionWith(bundle.SampleCourses(phase));
                     }
                 }
@@ -276,7 +277,7 @@ namespace CourseModel
         {
             Period realPeriod = GetPracticPeriod(period, role);
 
-            if (period.IsTheDayEnds())
+            if (realPeriod.IsTheDayEnds())
             {
                 return true;
             }
@@ -296,16 +297,16 @@ namespace CourseModel
         public bool IsStudentsAvailable(Period period, int occurrencesIndex, string role)
         {
             double ratio = studentNumber / (double)tLo;
-            int addition = LecturePoints;
+            int addition = LecturePoints / LectureParts;
             if (role == Constants.TARole)
             {
                 ratio = studentNumber / (double)tTAo;
                 addition = TAPoints;
             }
-            List<Period> periods = new() { period };
-            for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
+            List<Period> periods = new();
+            for (int i = period.StartTime; i < period.StartTime + addition; i++)
             {
-                periods.Add(new Period(period.Day, period.Semester, i, i + 1));
+                periods.Add(Constants.AvailablePeriodsFromPeriod[(period.Day, period.Semester, i)]);
             }
 
             bool flag = true;
@@ -340,7 +341,7 @@ namespace CourseModel
             List<Period> periods = new() { period };
             for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)
             {
-                periods.Add(new Period(period.Day, period.Semester, i, i + 1));
+                periods.Add(Constants.AvailablePeriodsFromPeriod[(period.Day, period.Semester, i)]);
             }
 
             foreach (Period per in periods)

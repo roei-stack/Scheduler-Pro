@@ -87,7 +87,7 @@ namespace CourseModel
                             Where(course => (course.LectureOccurrences[semester] > 0)))
                     {
                         otherDays.Clear();
-                        if (course.LectureOccurrences[semester] > 0)
+                        if (course.LectureOccurrences[semester] == 0)
                         {
                             continue;
                         }
@@ -113,6 +113,7 @@ namespace CourseModel
                                 continue;
                             }
                         }
+                        course.currentGroupNumber++;
                         foreach (string role in Constants.Roles)
                         {
                             UniStaff? employee = course.GetByRole(role);
@@ -131,7 +132,6 @@ namespace CourseModel
                                 }
                                 if (role == Constants.TARole)
                                 {
-                                    course.currentGroupNumber++;
                                     course.TAOccurrences[semester]--;
                                 }
                                 
@@ -210,14 +210,15 @@ namespace CourseModel
                         // assign TA
                         taPeriod = course.GetPracticPeriod(period, Constants.TARole);
                         course.UpdateUnoverlapableTimes(taPeriod, Constants.TARole, phase);
-                        Schedule(ta, course, taPeriod, phase, Constants.TARole);
+                        Schedule(ta, course, taPeriod, course.currentGroupNumber, Constants.TARole);
                         course.TAsAfterLecture--;
                     }
                     // assign
                     otherDays.Add(period.Day);
                     currentPart++;
                     course.UpdateUnoverlapableTimes(realPeriod, Constants.LecturerRole, phase);
-                    Schedule(lecturer, course, realPeriod, phase, Constants.LecturerRole);
+                    Schedule(lecturer, course, realPeriod,
+                        course.currentGroupNumber, Constants.LecturerRole);
                 }
             }
             return 0;
@@ -263,7 +264,7 @@ namespace CourseModel
                 otherDays.Add(period.Day);
                 currentPart++;
                 course.UpdateUnoverlapableTimes(realPeriod, role, phase);
-                Schedule(employee, course, realPeriod, phase, role);
+                Schedule(employee, course, realPeriod, course.currentGroupNumber, role);
             }
             if (!studentsImportant)
             {
@@ -332,6 +333,7 @@ namespace CourseModel
                 }
                 foreach (var employee in input.Staff)
                 {
+                    employee.Init();
                     if (employee.IsTeachingCourse(course))
                     {
                         course.UpdateCourseStaff(employee);

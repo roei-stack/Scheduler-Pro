@@ -29,6 +29,8 @@ namespace CourseModel
             return true;
         }
 
+        public void Init() { }
+
         public bool IsTeachingCourse(Course course)
         {
             return SharedCourses.Contains(course);
