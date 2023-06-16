@@ -205,6 +205,8 @@ export const parseStaffFileContent = fileContent => {
                         staffList: staffList,
                         sharedCourses: sharedCourses
                     });
+                } else {
+                    throw new Error('no section found (MultipleUniStaff/LoneUniStaff)')
                 }
             } catch (error) {
                 throw new Error(`Failed to parse staff at line ${i + 1}: ${error.message}`);
@@ -357,8 +359,9 @@ export const parseMajorsFileContent = fileContent => {
                     bundles: bundles
                 });
                 majorNames.add(majorName);
+            } else {
+                throw new Error('no section found (CourseBundles/Majors)');
             }
-
         } catch (error) {
             throw new Error(`Failed to parse majors at line ${i + 1}: ${error.message}`);
         }
