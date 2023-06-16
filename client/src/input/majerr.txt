@@ -1,0 +1,11 @@
+CourseBundles
+CS_Bundle1, 40, 8, 1, CS101;CS201
+CS_Bundle2, 6, 12, 2, CS201;CS202;CS301
+Math_Bundle1, 6, 10, 1, MATH101;MATH102
+Math_Bundle2, 6, 12, 2, MATH201;MATH202;MATH301
+Physics_Bundle1, 8, 14, 1, PHYS101;PHYS102;PHYS201;PHYS202
+
+Majors
+Computer Science, CS_Bundle1;CS_Bundle2;Math_Bundle1
+Mathematics, Math_Bundle1;Math_Bundle2;CS_Bundle1
+Physics, Physics_Bundle1;Math_Bundle1

@@ -331,10 +331,17 @@ export const parseMajorsFileContent = fileContent => {
                 if (courses.length === 0 || new Set(courses).size !== courses.length) {
                     throw new Error(`CourseBundles: Empty or Duplicate course ID/s in bundle '${bundleId}'`);
                 }
+                
+                const minCreditPoints = parseInteger(parts[1], 'minCreditPoints');
+                const maxCreditPoints = parseInteger(parts[2], 'maxCreditPoints');
+                if (minCreditPoints > maxCreditPoints) {
+                    throw new Error(`CourseBundles: minimum credit is higher than maximum credit in bundle '${bundleId}'`);
+                }
+
                 MajorsData.courseBundles.push({
                     id: bundleId,
-                    minCreditPoints: parseInteger(parts[1], 'minCreditPoints'),
-                    maxCreditPoints: parseInteger(parts[2], 'maxCreditPoints'),
+                    minCreditPoints: minCreditPoints,//todo
+                    maxCreditPoints: maxCreditPoints,
                     year: parseInteger(parts[3], 'year'),
                     courses: courses
                 });

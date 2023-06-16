@@ -78,7 +78,7 @@ function InstitutionSetup() {
 
     const isFinishedAllStages = () => currentStage === STAGES + 1;
 
-    const handleDataFetch = () => { 
+    const handleDataFetch = () => {
         setFetchState(FETCH_STATES.FETCHING);
         try {
             validateData();
@@ -93,7 +93,7 @@ function InstitutionSetup() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 courseList: dataLists[0],
                 loneUniStaffList: dataLists[1].loneUniStaff,
                 multipleUniStaffList: dataLists[1].multipleUniStaff,
@@ -139,6 +139,19 @@ function InstitutionSetup() {
         for (const id of majorsCourseBundlesIds) {
             if (!courseIds.includes(id)) {
                 throw new Error(`Majors: course ${id} shows up in courseBundles, but it does not exist`);
+            }
+        }
+
+        // for each bundle => check that minPoints <= sum(points)
+        const courseBundles = dataLists[2].courseBundles;
+        for (const bundle of courseBundles) {
+            const bundleCourses = courseList.filter(c => bundle.courses.includes(c.id));
+            let pointsSum = 0;
+            bundleCourses.forEach(c => {
+                pointsSum += c.lecture_points + c.TA_points;
+            });
+            if (pointsSum < bundle.minCreditPoints) {
+                throw new Error(`Course bundles (Majors): bundle ${bundle.id} minimumPoints value (${bundle.minCreditPoints} is higher than the total points earned from all courses in that bundle)`);
             }
         }
     }
