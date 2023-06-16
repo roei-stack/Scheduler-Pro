@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../Button';
 import './Pages.css';
 import './Account.css';
+import { AuthContext, SERVER, notifyError } from '../../AuthContextProvider';
+import ScheduleTable from './ScheduleTable';
 
 function Account() {
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
-  const handleScheduleClick = item => setSelectedSchedule(item);
+  const { token } = useContext(AuthContext);
 
-  const schedules = [
-    { id: 1, iconClass: 'fa-solid fa-book-open-reader', title: 'schedule 1' },
-    { id: 2, iconClass: 'fa-solid fa-book-open-reader', title: 'schedule 2' },
-    { id: 3, iconClass: 'fa-solid fa-book-open-reader', title: 'schedule 3' },
-  ];
+  const isMountedRef = useRef(false);
+  useEffect(() => {
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
+    //fetchScheduels()
+  }, []);
+
+  const fetchScheduels = () => {
+    fetch(`${SERVER}/Account/schedualList`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(`An error occured (${response.status})`);
+      }
+    }).then(data => {
+
+    }).catch(error => notifyError(error.message));
+  };
 
   return (
     <section className='account'>
@@ -22,18 +44,18 @@ function Account() {
           <Button buttonStyle='btn--outline'><i class="fa-solid fa-plus"></i>&nbsp;New</Button>
         </div>
         <ul>
-          {schedules.map(item => (
-            <li key={item.id} className='side-menu-item'>
-              <Link onClick={() => handleScheduleClick(item)}>
-                <i className={`main-icon ${item.iconClass}`} />
-                <span>{item.title}</span>
+          {[...Array(3)].map((item) => (
+            <li key={item} className='side-menu-item'>
+              <Link onClick={() => { }}>
+                <i className={`main-icon fa-solid fa-book-open-reader`} />
+                <span>schedual</span>
               </Link>
             </li>
           ))}
         </ul>
       </nav>
       <div className='right-side'>
-        {selectedSchedule ? (<h2>{selectedSchedule.title}</h2>) : (<p>Default html...</p>)}
+        <ScheduleTable />
       </div>
     </section >
   );

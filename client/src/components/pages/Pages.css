@@ -1,5 +1,4 @@
 .home,
-.account,
 .account-setup,
 .services,
 .sign-up,
@@ -23,6 +22,9 @@
 }
 
 .account {
+    display: flex;
+    min-height: 100vh;
+    color: #fff;
     background-color: #2d333b;
 }
 

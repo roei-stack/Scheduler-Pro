@@ -5,9 +5,15 @@
   max-width: 420px;
   width: 22%;
   height: 100vh;
-  margin-right: auto;
   border-right: 1px solid rgba(235, 235, 235, 0.5);
   overflow-y: auto;
+}
+
+.right-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .account .side-menu-title {

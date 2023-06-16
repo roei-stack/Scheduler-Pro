@@ -154,6 +154,15 @@ function InstitutionSetup() {
                 throw new Error(`Course bundles (Majors): bundle ${bundle.id} minimumPoints value (${bundle.minCreditPoints} is higher than the total points earned from all courses in that bundle)`);
             }
         }
+        // חייב יותר קבוצות הרצאה התרגול בכל סמסטר
+        // for each course => make sure it has enough letrurers and TA's
+       /* for (const course of courseList) {
+            console.log(course.lecture_occurrences);
+            const sum = Object.values(course.lecture_occurrences).reduce((a, b) => a + b, 0);
+            console.log(sum);
+        }
+
+        throw new Error('f');*/
     }
 
     return (

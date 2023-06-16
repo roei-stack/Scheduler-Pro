@@ -25,7 +25,6 @@ function FileUpload({ onSuccess = () => { }, parseFileContent = () => { }, child
             try {
                 const parsedData = parseFileContent(fileContent);
                 setIsDisabled(true);
-                //console.log(parsedData);
                 onSuccess(parsedData);
             } catch (error) {
                 notifyError(`Error parsing file: ${error.message}`);
