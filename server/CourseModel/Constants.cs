@@ -9,8 +9,8 @@ namespace CourseModel
     public class Constants
     {
         public static readonly string[] Semesters = { "a", "b", "summer" };
-        public static readonly string LecturerRole = "lecturer";
-        public static readonly string TARole = "ta";
+        public static readonly string LecturerRole = "Lecturer";
+        public static readonly string TARole = "TA";
         public static readonly string[] Roles = {LecturerRole, TARole};
         public static readonly string Lecture = "Lecture";
         public static readonly string Exercise = "Exercise";

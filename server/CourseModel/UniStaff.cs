@@ -12,5 +12,6 @@ namespace CourseModel
         public bool IsTeachingCourse(Course course);
         public bool IsSomeRole(Course course, string role);
         public void Schedule(Course course, string role, Period period);
+        public void Init();
     }
 }

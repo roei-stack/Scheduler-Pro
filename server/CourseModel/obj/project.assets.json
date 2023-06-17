@@ -8,19 +8,19 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Roei\\.nuget\\packages\\": {}
+    "C:\\Users\\eitha\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Roei\\Desktop\\Project\\server\\CourseModel\\CourseModel.csproj",
+      "projectUniqueName": "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\gitITv3\\server\\CourseModel\\CourseModel.csproj",
       "projectName": "CourseModel",
-      "projectPath": "C:\\Users\\Roei\\Desktop\\Project\\server\\CourseModel\\CourseModel.csproj",
-      "packagesPath": "C:\\Users\\Roei\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Roei\\Desktop\\Project\\server\\CourseModel\\obj\\",
+      "projectPath": "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\gitITv3\\server\\CourseModel\\CourseModel.csproj",
+      "packagesPath": "C:\\Users\\eitha\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\eitha\\Desktop\\איתן\\בר אילן אוניברסיטה\\שנים\\שנה ג\\פרויקט שנתי\\gitITv3\\server\\CourseModel\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Roei\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\eitha\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -51,8 +51,7 @@
           "net47",
           "net471",
           "net472",
-          "net48",
-          "net481"
+          "net48"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -61,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
       }
     }
   }

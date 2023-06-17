@@ -25,13 +25,12 @@ namespace CourseModel
             this.Name = name;
             this.CoursesRolesOccurrences = coursesRolesOccurrences;
         }
-
-        public LoneUniStaff(List<Period> unavailableTimes, Dictionary<Course,
-            Dictionary<string, int>> coursesRolesOccurrences)
+        public void Init()
         {
-            UnavailableTimes = unavailableTimes;
-            CoursesRolesOccurrences = coursesRolesOccurrences;
-
+            if (UnavailableTimes == null)
+            {
+                UnavailableTimes = new List<Period>();
+            }
             CoursesLectureParts = new Dictionary<Course, int>();
             foreach (Course course in CoursesRolesOccurrences.Keys)
             {
