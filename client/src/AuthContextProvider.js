@@ -25,8 +25,18 @@ export const notifyError = text => toast.error(text, { position: "bottom-left", 
 export const notifySuccess = text => toast.success(text, { position: "bottom-left", theme: "dark" });
 export const notifyInfo = text => toast.info(text, { position: "bottom-left", theme: "dark" });
 
+export const semestersOptions = ['a', 'b', 'summer'];
 export const MIN_HOUR = 9;
 export const MAX_HOUR = 22;
+export const daysOfWeekOptions = [
+  { label: 'Sunday', value: 1 },
+  { label: 'Monday', value: 2 },
+  { label: 'Tuesday', value: 3 },
+  { label: 'Wednesday', value: 4 },
+  { label: 'Thursday', value: 5 },
+  { label: 'Friday', value: 6 },
+  { label: 'Saturday', value: 7 }
+];
 
 function AuthContextProvider({ children }) {
   const [token, setToken] = useState(null);

@@ -1,19 +1,8 @@
 import React, { useRef, useState } from 'react';
 import Button from '../Button';
-import { MAX_HOUR, MIN_HOUR, SERVER, notifyError, notifySuccess } from '../../AuthContextProvider';
+import { MAX_HOUR, MIN_HOUR, SERVER, notifyError, notifySuccess, semestersOptions } from '../../AuthContextProvider';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const daysOfWeekOptions = [
-  { label: 'Sunday', value: 1 },
-  { label: 'Monday', value: 2 },
-  { label: 'Tuesday', value: 3 },
-  { label: 'Wednesday', value: 4 },
-  { label: 'Thursday', value: 5 },
-  { label: 'Friday', value: 6 },
-  { label: 'Saturday', value: 7 }
-];
-
-const semestersOptions = ['A', 'B', 'Summer'];
+import { daysOfWeekOptions } from '../../AuthContextProvider';
 
 function StudentForm( {courseIds} ) {
   const idRef = useRef();
@@ -23,7 +12,7 @@ function StudentForm( {courseIds} ) {
   const [courseIdsList, setCourseIdsList] = useState([]);
 
   const addTime = () => {
-    setUnavailableTimes([...unavailableTimes, { day: 1, semester: 'A', startTime: MIN_HOUR, endTime: MIN_HOUR + 1 }]);
+    setUnavailableTimes([...unavailableTimes, { day: 1, semester: semestersOptions[0], startTime: MIN_HOUR, endTime: MIN_HOUR + 1 }]);
   };
 
   const addCourseId = () => {
