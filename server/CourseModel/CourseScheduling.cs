@@ -9,8 +9,10 @@ namespace CourseModel
     public class CourseScheduling
     {
         public Course Course { get; set; }
-        // int - for the group ID
-        // map(group ID) -> staff, times in the weak, semester
+        /// <summary>
+        /// int - for the group ID.
+        /// map(group ID) -> staff, times in the weak, role
+        /// </summary>
         public Dictionary<int, (UniStaff, List<Period>, string)> CourseGroups { get; set; }
 
         public CourseScheduling(Course course)

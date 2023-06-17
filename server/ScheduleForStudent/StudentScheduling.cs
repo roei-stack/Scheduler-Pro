@@ -9,7 +9,9 @@ namespace ScheduleForStudent
 {
     public class StudentScheduling
     {
-        // map(time {full hour from Constants}) -> class type, group nubmer, course)
+        /// <summary>
+        /// map(time {full hour from Constants}) -> class type, group nubmer, course)
+        /// </summary>
         public Dictionary<Period, (string, int, CourseProperties)> Schedule;
     
         public StudentScheduling()
