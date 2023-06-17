@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.Text.Json;
 using CourseModel;
+using System.Collections.Generic;
 /*
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -339,10 +340,94 @@ namespace server.Controllers
             
             SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(institutionInput);
             schedulerAlgorithm.Run();
-            Console.WriteLine(schedulerAlgorithm.AlgorithmMessage);
+            
+            bool isSuccessful;
+            Dictionary<string, Dictionary<int, ScheduledCourseGroupData>> coursesScheduled;
+            try
+            {
+                coursesScheduled = BuildInstitutionOutput(schedulerAlgorithm);
+                if (schedulerAlgorithm.AlgorithmMessage == Constants.OverlapSuccess)
+                {
+                    isSuccessful = true;
+                } else if (schedulerAlgorithm.AlgorithmMessage == Constants.OverlapFail)
+                {
+                    isSuccessful = false;
+                } else
+                {
+                    return StatusCode(500);
+                }
+            } catch (Exception)
+            {
+                return StatusCode(500);
+            }
 
-            // todo cleanup
-            return Ok();
+            // cleanup
+            // remove old forms
+            var staffFormsToRemove = dbContext.StaffFormInputs.Where(form => form.InstitutionUsername == username);
+            dbContext.StaffFormInputs.RemoveRange(staffFormsToRemove);
+            var studentFormsToRemove = dbContext.StudentFormInputs.Where(form => form.InstitutionUsername == username);
+            dbContext.StudentFormInputs.RemoveRange(studentFormsToRemove);
+
+            // generate new forms
+            institutionData.StaffFormId = $"{Guid.NewGuid()}";
+            institutionData.StudentFormId = $"{Guid.NewGuid()}";
+
+            await dbContext.SaveChangesAsync();
+            return Ok( new {output = coursesScheduled, isSuccessful = isSuccessful});
+        }
+
+        private Dictionary<string, Dictionary<int, ScheduledCourseGroupData>> BuildInstitutionOutput(SchedulerAlgorithm schedulerAlgorithm)
+        {
+            var coursesScheduled = new Dictionary<string, Dictionary<int, ScheduledCourseGroupData>>();
+            foreach (KeyValuePair<Course, CourseScheduling> kvp in schedulerAlgorithm.SuperCourses)
+            {
+                string? newKey = kvp.Key.CourseId;
+                if (newKey == null)
+                {
+                    throw new Exception();
+                }
+                Dictionary<int, ScheduledCourseGroupData> newValue = ParseCourseScheduling(kvp.Value);
+                coursesScheduled[newKey] = newValue;
+            }
+            return coursesScheduled;
+        }
+
+        private Dictionary<int, ScheduledCourseGroupData> ParseCourseScheduling(CourseScheduling courseScheduling)
+        {
+            var parsedCourseScheduling = new Dictionary<int, ScheduledCourseGroupData>();
+            Dictionary<int, (UniStaff, List<Period>, string)> courseGroups = courseScheduling.CourseGroups;
+
+            foreach (KeyValuePair<int, (UniStaff, List<Period>, string)> kvp in courseGroups)
+            {
+                int groupIdKey = kvp.Key;
+                
+                UniStaff staff = kvp.Value.Item1;
+                List<string> staffIdList = new List<string>();
+                if (staff is LoneUniStaff)
+                {
+                    LoneUniStaff loneUniStaff = (LoneUniStaff)staff;
+                    staffIdList.Add(loneUniStaff.ID);
+                } else
+                {
+                    MultipleUniStaff multipleUniStaff = (MultipleUniStaff)staff;
+                    List<UniStaff> uniStaffList = multipleUniStaff.UniStaffList;
+                    foreach (UniStaff uniStaff in uniStaffList)
+                    {
+                        LoneUniStaff innerStaff = (LoneUniStaff)uniStaff;
+                        staffIdList.Add(innerStaff.ID);
+                    }
+                }
+                List<Period> periods = kvp.Value.Item2;
+                string role = kvp.Value.Item3;
+
+                parsedCourseScheduling[groupIdKey] = new ScheduledCourseGroupData 
+                { 
+                    StaffIds = staffIdList,
+                    Periods = periods,
+                    Type = role 
+                };
+            }
+            return parsedCourseScheduling;
         }
 
         private string RefreshToken(User user)
