@@ -25,6 +25,9 @@ export const notifyError = text => toast.error(text, { position: "bottom-left", 
 export const notifySuccess = text => toast.success(text, { position: "bottom-left", theme: "dark" });
 export const notifyInfo = text => toast.info(text, { position: "bottom-left", theme: "dark" });
 
+export const MIN_HOUR = 9;
+export const MAX_HOUR = 22;
+
 function AuthContextProvider({ children }) {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState('');

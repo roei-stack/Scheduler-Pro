@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import Button from '../Button';
-import { SERVER, notifyError, notifySuccess } from '../../AuthContextProvider';
+import { MAX_HOUR, MIN_HOUR, SERVER, notifyError, notifySuccess } from '../../AuthContextProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const daysOfWeekOptions = [
@@ -23,7 +23,7 @@ function StudentForm( {courseIds} ) {
   const [courseIdsList, setCourseIdsList] = useState([]);
 
   const addTime = () => {
-    setUnavailableTimes([...unavailableTimes, { day: 1, semester: 'A', startTime: 0, endTime: 1 }]);
+    setUnavailableTimes([...unavailableTimes, { day: 1, semester: 'A', startTime: MIN_HOUR, endTime: MIN_HOUR + 1 }]);
   };
 
   const addCourseId = () => {
@@ -111,7 +111,7 @@ function StudentForm( {courseIds} ) {
               onChange={(e) => {
                 const updatedTimes = [...unavailableTimes];
                 let newStartHour = parseInt(e.target.value);
-                newStartHour = isNaN(newStartHour) ? 0 : Math.min(Math.max(newStartHour, 0), 24); // Ensure the value is within the range of 0 to 24
+                newStartHour = isNaN(newStartHour) ? MIN_HOUR : Math.min(Math.max(newStartHour, MIN_HOUR), MAX_HOUR); // Ensure the value is within the range of 0 to 24
                 const currentEndHour = updatedTimes[index].endTime;
                 updatedTimes[index].startTime = Math.min(newStartHour, currentEndHour - 1); // Limit startTime to not exceed endTime
                 setUnavailableTimes(updatedTimes);
@@ -124,7 +124,7 @@ function StudentForm( {courseIds} ) {
               onChange={(e) => {
                 const updatedTimes = [...unavailableTimes];
                 let newEndHour = parseInt(e.target.value);
-                newEndHour = isNaN(newEndHour) ? 0 : Math.min(Math.max(newEndHour, 0), 24); // Ensure the value is within the range of 0 to 24
+                newEndHour = isNaN(newEndHour) ? MIN_HOUR : Math.min(Math.max(newEndHour, MIN_HOUR), MAX_HOUR); // Ensure the value is within the range of 0 to 24
                 const currentStartHour = updatedTimes[index].startTime;
                 updatedTimes[index].endTime = Math.max(newEndHour, currentStartHour + 1); // Limit endTime to not go below startTime
                 setUnavailableTimes(updatedTimes);
