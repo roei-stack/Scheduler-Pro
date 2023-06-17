@@ -12,14 +12,15 @@ namespace ScheduleForStudent
         public string Name { get; set; }
         public string ID { get; set; }
         /// <summary>
-        /// map(type {lecture / TA}) -> map(group number) -> times
+        /// map(type {lecture / exercise}) -> map(group number) -> times
         /// </summary>
         public Dictionary<string, Dictionary<int, List<Period>>> Groups;
         /// <summary>
-        /// map(type {lecture / TA}) -> duration of the class
+        /// map(type {lecture / exercise}) -> duration of the class
         /// </summary>
         public Dictionary<string, int> Duration { get; set; }
 
+        // lectureDuration = lecturePoints / lectureParts
         public CourseProperties(string name, string id,
             Dictionary<string, Dictionary<int, List<Period>>> groups,
             int lectureDuration, int exerciseDuration)
