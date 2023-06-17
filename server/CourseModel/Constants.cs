@@ -11,7 +11,7 @@ namespace CourseModel
         public static readonly string[] Semesters = { "a", "b", "summer" };
         public static readonly string LecturerRole = "Lecturer";
         public static readonly string TARole = "TA";
-        public static readonly string[] Roles = {LecturerRole, TARole};
+        public static readonly string[] Roles = { LecturerRole, TARole };
         public static readonly string Lecture = "Lecture";
         public static readonly string Exercise = "Exercise";
         public static readonly string OverlapFail = "Failed to prevent overlapping, you can cry or change the bundles. Your call";
@@ -20,7 +20,9 @@ namespace CourseModel
         public static readonly int MaxHour = 22;
         public static readonly int MaxDay = 5;
         public static List<Period> AvailablePeriods;
-        // day, string, start time
+        /// <summary>
+        /// day, string, start time
+        /// </summary>
         public static Dictionary<(int, string, int), Period> AvailablePeriodsFromPeriod;
 
         static Constants()

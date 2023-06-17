@@ -51,6 +51,10 @@ namespace CourseModel
                         foreach (Period period in Constants.AvailablePeriods.Where(
                                   period => (period.Semester == semester)))
                         {
+                            if (0 == course.TAOccurrences[semester])
+                            {
+                                break;
+                            }
                             ta = course.FindStaff(period, Constants.TARole);
                             if (ta == null)
                             {
@@ -81,7 +85,7 @@ namespace CourseModel
             int tryOutput;
             foreach (string semester in Constants.Semesters)
             {
-                for (int phase = 1; phase < Course.MaxPhase[semester]; phase++)
+                for (int phase = 1; phase <= Course.MaxPhase[semester]; phase++)
                 {
                     foreach (Course course in SuperCourses.Keys.
                             Where(course => (course.LectureOccurrences[semester] > 0)))
@@ -113,7 +117,6 @@ namespace CourseModel
                                 continue;
                             }
                         }
-                        course.currentGroupNumber++;
                         foreach (string role in Constants.Roles)
                         {
                             UniStaff? employee = course.GetByRole(role);
@@ -133,8 +136,9 @@ namespace CourseModel
                                 if (role == Constants.TARole)
                                 {
                                     course.TAOccurrences[semester]--;
+                                    course.currentGroupNumber++;
                                 }
-                                
+
                             }
                             otherDays.Clear();
                         }
@@ -449,14 +453,12 @@ namespace CourseModel
             {
                 groupNum += course.tLo;
             }
-            if (SuperCourses[course].CourseGroups.ContainsKey(groupNum))
-            {
-                SuperCourses[course].CourseGroups[groupNum].Item2.Add(period);
-            }
-            else
+            if (!SuperCourses[course].CourseGroups.ContainsKey(groupNum))
             {
                 SuperCourses[course].CourseGroups.Add(groupNum, (staff, new List<Period>(), role));
             }
+            SuperCourses[course].CourseGroups[groupNum].Item2.Add(period);
+
         }
     }
 }

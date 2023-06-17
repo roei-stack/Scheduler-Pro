@@ -157,6 +157,7 @@ namespace CourseModel
             {
                 for (int hour = period.StartTime; hour < period.EndTime; hour++)
                 {
+                    if (hour < Constants.MinHour || hour >= Constants.MaxHour) { continue; }
                     NonAvailableStudants[
                         Constants.AvailablePeriodsFromPeriod[(period.Day, period.Semester, hour)]]
                         [studentCounter]++;
@@ -336,7 +337,7 @@ namespace CourseModel
 
         public bool IsStudentsAvailableForTheRemainingTas(Period period)
         {
-            double ratio = studentNumber / (double) tTAo;
+            double ratio = studentNumber / (double)tTAo;
             int addition = TAPoints;
             List<Period> periods = new() { period };
             for (int i = period.StartTime + 1; i < period.StartTime + addition; i++)

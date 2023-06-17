@@ -43,5 +43,35 @@ namespace CourseModel
         {
             return EndTime > Constants.MaxHour;
         }
+
+        public static bool AreOverlaping(IEnumerable<Period> periods1,
+                                         IEnumerable<Period> periods2)
+        {
+            foreach (Period period in periods1)
+            {
+                if (period.IsPeriodOverlap(periods2))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsTherePeriodThatStartsInTheSameTime(IEnumerable<Period> periods)
+        {
+            foreach (var period in periods)
+            {
+                // Check if the periods overlap
+                if (Day == period.Day &&
+                    Semester == period.Semester &&
+                    StartTime == period.StartTime)
+                {
+                    // Overlapping periods found
+                    return true;
+                }
+            }
+            // Not found
+            return false;
+        }
     }
 }
