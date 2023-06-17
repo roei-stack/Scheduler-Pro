@@ -18,5 +18,28 @@ namespace ScheduleForStudent
         {
             Schedule = new Dictionary<Period, (string, int, CourseProperties)>();
         }
+
+        public int Evaluate(StudentDemands demands, List<string> currentCoursesIds)
+        {
+            if (Schedule.Count == 0)
+            {
+                return int.MinValue;
+            }
+            int count = 0;
+            HashSet<int> days = new();
+            foreach (Period period in Schedule.Keys)
+            {
+                if (period.IsPeriodOverlap(demands.UnavailableTimes))
+                {
+                    count -= 2;
+                }
+                days.Add(period.Day);
+            }
+            count += (demands.PreferedNumberOfLearningDays - days.Count());
+
+            count += 10 * (currentCoursesIds.Count() - demands.WantedCourses.Count());
+
+            return count;
+        }
     }
 }

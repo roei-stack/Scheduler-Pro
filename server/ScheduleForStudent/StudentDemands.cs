@@ -4,8 +4,6 @@ namespace ScheduleForStudent
 {
     public class StudentDemands
     {
-        public string? Name { get; set; }
-        public int? Id { get; set; }
         public List<Period> UnavailableTimes { get; set; }
         public List<string> WantedCourses { get; set; }
         public int PreferedNumberOfLearningDays { get; set; }

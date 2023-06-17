@@ -10,7 +10,8 @@ namespace ScheduleForStudent
     public class StudentsSchedulingAlgorithm
     {
         public StudentDemands Demands { get; set; }
-        public Dictionary<string, CourseProperties> Courses { get; set; }
+        private Dictionary<string, CourseProperties>? Courses;
+        private Dictionary<Course, CourseScheduling>? SuperCourses;
         public StudentScheduling ProStudentScheduling { get; set; }
         private List<Period> unoverlapablePeriods;
         /// <summary>
@@ -18,10 +19,24 @@ namespace ScheduleForStudent
         /// </summary>
         private Dictionary<string, string> semesterTable;
         private Dictionary<string, int> progressTable;
+        private bool fromInstutution;
+
+        public StudentsSchedulingAlgorithm(StudentDemands demands,
+                 Dictionary<Course, CourseScheduling>? superCourses)
+        {
+            Demands = demands;
+            SuperCourses = superCourses;
+            ProStudentScheduling = new StudentScheduling();
+            unoverlapablePeriods = new List<Period>();
+            progressTable = new Dictionary<string, int>();
+            semesterTable = new Dictionary<string, string>();
+            fromInstutution = true;
+        }
 
         public StudentsSchedulingAlgorithm(StudentDemands demands,
                     Dictionary<string, CourseProperties> courses)
         {
+            fromInstutution = false;
             Demands = demands;
             Courses = courses;
             ProStudentScheduling = new StudentScheduling();
@@ -36,10 +51,80 @@ namespace ScheduleForStudent
 
         public void Run()
         {
+            if (fromInstutution)
+            {
+                ScheduleFromInstutution();
+                return;
+            }
             ScheduleClasses(true);
             ScheduleClasses(false);
             FindRemaningExercises(true);
             FindRemaningExercises(false);
+        }
+
+        private void ScheduleFromInstutution()
+        {
+            List<string> currentCoursesIds;
+            List<string> bestCurrentCoursesIds = new();
+            int groupNumber = 1;
+            bool existGroupNumber = true;
+            StudentScheduling helpScheduling;
+            while (existGroupNumber)
+            {
+                helpScheduling = new StudentScheduling();
+                currentCoursesIds = new();
+                foreach (Course course in SuperCourses.Keys.Where(course =>
+                                         Demands.WantedCourses.Contains(course.CourseId))) {
+                    if (!SuperCourses[course].CourseGroups.ContainsKey(groupNumber + course.tLo))
+                    {
+                        existGroupNumber = false;
+                        continue;
+                    }
+                    existGroupNumber = true;
+                    ScheduleCourseGroupFromInstitution(course, groupNumber, helpScheduling);
+                    ScheduleCourseGroupFromInstitution(course, groupNumber + course.tLo, helpScheduling);
+                }
+                CompleteRemainingCourses(helpScheduling);
+                groupNumber++;
+                if (ProStudentScheduling.Evaluate(Demands, currentCoursesIds)
+                    < helpScheduling.Evaluate(Demands, bestCurrentCoursesIds))
+                {
+                    ProStudentScheduling = helpScheduling;
+                    bestCurrentCoursesIds = currentCoursesIds;
+                }
+            }
+        }
+
+        private void ScheduleCourseGroupFromInstitution(Course course,
+                    int groupNumber, StudentScheduling helpScheduling)
+        {
+            string classType = Constants.Lecture;
+            Period per;
+            if (SuperCourses[course].CourseGroups[groupNumber].Item3 == Constants.TARole)
+            {
+                classType = Constants.Exercise;
+            }
+            if (SuperCourses[course].CourseGroups[groupNumber].Item3 == Constants.LecturerRole)
+            {
+                classType = Constants.Lecture;
+            }
+            (string, int, CourseProperties) input = (classType, groupNumber,
+                            new CourseProperties(course));
+            foreach (Period period in SuperCourses[course]
+                .CourseGroups[groupNumber].Item2)
+            {
+                for (int hour = period.StartTime; hour < period.EndTime; hour++)
+                {
+                    per = Constants.AvailablePeriodsFromPeriod
+                                    [(period.Day, period.Semester, hour)];
+                    helpScheduling.Schedule[per] = input;
+                }
+            }
+        }
+
+        private void CompleteRemainingCourses(StudentScheduling helpScheduling)
+        {
+
         }
 
         private void ScheduleClasses(bool studentImportant)

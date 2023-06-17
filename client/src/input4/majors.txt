@@ -1,0 +1,5 @@
+CourseBundles
+Bundle1, 2, 6, 1, ENG101;MATH101
+
+Majors
+Full Major, Bundle1
