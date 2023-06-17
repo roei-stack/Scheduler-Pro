@@ -1,0 +1,12 @@
+CourseBundles
+Madnatory_English, 4, 8, 2, ENG101
+CS_Bundle, 6, 9, 1, CS101;CS202;CS302
+Physics_Bundle, 6, 12, 1, PHYS101;PHYS202
+Math_Bundle, 8, 14, 1, MATH101;MATH202;MATH301
+Math_Bundle_Light, 4, 14, 1, MATH101;MATH202;MATH301
+
+Majors
+Computer Science, Madnatory_English;CS_Bundle;Math_Bundle_Light
+Computer Science and Mathematics, Madnatory_English;CS_Bundle;Math_Bundle
+Physics Major, Physics_Bundle;Math_Bundle_Light;Madnatory_English
+Math Major, Math_Bundle;Madnatory_English

@@ -70,7 +70,7 @@ function InstitutionAccount() {
         const type = value.type;
 
         for (const [_, period] of Object.entries(periods)) {
-          const row = `${courseId},${groupNumber},${staffIds.join(';')},${period.semester},${convertStringToDayString(period.day)},${period.startTime},${period.endTime},${type}\n`;
+          const row = `${courseId},${groupNumber},${staffIds.join(';')},${period.semester},${convertStringToDayString(period.day)},${period.startTime}:00,${period.endTime}:00,${type}\n`;
           csvContent += row;
         }
       }

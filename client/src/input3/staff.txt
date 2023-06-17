@@ -1,0 +1,7 @@
+LoneUniStaff
+1,John Doe,{CS302: {TA: 3};CS101: {TA: 2};ENG101: {Lecturer: 3}; MATH101: {Lecturer: 3}; MATH202: {Lecturer: 6; TA: 6}}
+2,Jane Smith,{CS101: {TA: 2};ENG101: {TA: 6};MATH101: {TA: 3};MATH202: {TA: 3};MATH301: {TA: 3}}
+3,Avi Pear, {CS101: {TA: 2};PHYS101: {Lecturer: 3; TA: 3}; PHYS202: {Lecturer: 3; TA: 3}}
+4,Dan Shafir, {MATH301: {Lecturer: 3};PHYS202: {TA: 3}; PHYS101: {TA: 3}}
+5,Noa Agmon, {CS101: {Lecturer: 3}; CS202: {Lecturer: 3; TA: 3}; CS302: {TA: 3}}
+6,Gal Kaminka, {CS302: {Lecturer: 6};CS101: {Lecturer: 3}}
