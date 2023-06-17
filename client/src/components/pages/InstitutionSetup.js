@@ -154,15 +154,45 @@ function InstitutionSetup() {
                 throw new Error(`Course bundles (Majors): bundle ${bundle.id} minimumPoints value (${bundle.minCreditPoints} is higher than the total points earned from all courses in that bundle)`);
             }
         }
-        // חייב יותר קבוצות הרצאה התרגול בכל סמסטר
         // for each course => make sure it has enough letrurers and TA's
-       /* for (const course of courseList) {
-            console.log(course.lecture_occurrences);
-            const sum = Object.values(course.lecture_occurrences).reduce((a, b) => a + b, 0);
-            console.log(sum);
+        const courseOccurancesCounters = courseList.map(course => ({
+            id: course.id,
+            countLectureOccurances: 0,
+            countTAOccurances: 0
+        }));
+
+        for (let i = 0; i < dataLists[1].loneUniStaff.length; i++) {
+            const staff = dataLists[1].loneUniStaff[i];
+            for (const key in staff.coursesRolesOccurrences) {
+                const valueDict = staff.coursesRolesOccurrences[key];
+                for (const roleKey in valueDict) {
+                    const occuranceValue = valueDict[roleKey];
+                    const courseOccurancesCounter = courseOccurancesCounters.find(i => i.id === key);
+                    if (roleKey === 'TA') {
+                        courseOccurancesCounter.countTAOccurances += occuranceValue;
+                    } else {
+                        courseOccurancesCounter.countLectureOccurances += occuranceValue;
+                    }
+                }
+            }
         }
 
-        throw new Error('f');*/
+        for (const i in courseOccurancesCounters) {
+            const courseCounter = courseOccurancesCounters[i];
+            const course = courseList.find(c => c.id === courseCounter.id);
+            if (!course) {
+                throw new Error('Internal client error');
+            }
+            const totalLectureOccurances = Object.values(course.lecture_occurrences).reduce((acc, value) => acc + value, 0);
+            const totalTAOccurances = Object.values(course.TA_occurrences).reduce((acc, value) => acc + value, 0);
+
+            if (courseCounter.countLectureOccurances < totalLectureOccurances) {
+                throw new Error(`not enough lecture occurances for course ${course.id}`);
+            }
+            if (courseCounter.countTAOccurances < totalTAOccurances) {
+                throw new Error(`not enough TA occurances for course ${course.id}`);
+            }
+        }
     }
 
     return (

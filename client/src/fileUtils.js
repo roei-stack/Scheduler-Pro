@@ -38,14 +38,18 @@ export const parseCoursesFileContent = fileContent => {
         if (parsedCourseIds.has(parts[0].trim())) {
             throw new Error(`Duplicate course ID '${parts[0].trim()}' at line ${i + 1}`);
         }
+
         try {
+            const lecture_occurrences = parseDictionary(parts[4], 'lecture_occurrences', `${parts[0].trim()}_lecture`);
+            const TA_occurrences = parseDictionary(parts[5], 'TA_occurrences', `${parts[0].trim()}_TA`);
+            validateOccurances(lecture_occurrences, TA_occurrences);
             const course = {
                 id: parseString(parts[0], 'id'),
                 name: parseString(parts[1], 'name'),
                 lecture_points: parseInteger(parts[2], 'lecture_points'),
                 TA_points: parseInteger(parts[3], 'TA_points'),
-                lecture_occurrences: parseDictionary(parts[4], 'lecture_occurrences', `${parts[0].trim()}_lecture`),
-                TA_occurrences: parseDictionary(parts[5], 'TA_occurrences', `${parts[0].trim()}_TA`),
+                lecture_occurrences: lecture_occurrences,
+                TA_occurrences: TA_occurrences,
                 lecture_parts: parseInteger(parts[6], 'lecture_parts'),
                 TA_after_lecture: parts[7] ? parseInteger(parts[7], 'TA_after_lecture') : 0,
             };
@@ -59,6 +63,16 @@ export const parseCoursesFileContent = fileContent => {
         }
     }
     return courses;
+};
+
+const validateOccurances = (lecture_occurrences, TA_occurrences) => {
+    Object.keys(lecture_occurrences).forEach(key => {
+        const lectureCount = lecture_occurrences[key];
+        const TACount = TA_occurrences[key];
+        if (TACount < lectureCount) {
+            throw new Error('All TA occurances values cannot be lower than their corresponding lecture occurance value');
+        }
+    });
 };
 
 const parseString = (value, fieldName) => {
@@ -331,7 +345,7 @@ export const parseMajorsFileContent = fileContent => {
                 if (courses.length === 0 || new Set(courses).size !== courses.length) {
                     throw new Error(`CourseBundles: Empty or Duplicate course ID/s in bundle '${bundleId}'`);
                 }
-                
+
                 const minCreditPoints = parseInteger(parts[1], 'minCreditPoints');
                 const maxCreditPoints = parseInteger(parts[2], 'maxCreditPoints');
                 if (minCreditPoints > maxCreditPoints) {
