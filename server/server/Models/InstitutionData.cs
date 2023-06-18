@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using server.ViewModels;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace server.Models
@@ -129,6 +130,17 @@ namespace server.Models
             }
 
             return convertedDictionary;
+        }
+
+        [NotMapped]
+        public Dictionary<Course, CourseScheduling>? SuperCourses { get; set; }
+
+        [NotMapped]
+        public static Dictionary<string, Dictionary<Course, CourseScheduling>> Results;
+
+        static InstitutionData()
+        {
+            Results = new Dictionary<string, Dictionary<Course, CourseScheduling>>();
         }
     }
 }

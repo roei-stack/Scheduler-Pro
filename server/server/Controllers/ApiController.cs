@@ -359,7 +359,8 @@ namespace server.Controllers
                     return StatusCode(500);
                 }
                 institutionData.SetResults(coursesScheduled);
-
+                institutionData.SuperCourses = schedulerAlgorithm.SuperCourses;
+                InstitutionData.Results[institutionData.InstitutionName] = schedulerAlgorithm.SuperCourses;
             } catch (Exception)
             {
                 return StatusCode(500);
@@ -425,13 +426,6 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            var results = institutionData.GetResults();
-
-            if (results == null)
-            {
-                return BadRequest();
-            }
-
             // build input:
             List<string> wantedSemesters = new List<string>();
             if (viewModel.SemesterA)
@@ -449,27 +443,27 @@ namespace server.Controllers
 
             StudentDemands demands = new StudentDemands(viewModel.UnavilableTimes, viewModel.CourseIds, viewModel.LearningDays, viewModel.HoursPerDay, wantedSemesters);
 
-            SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(InstitutionData.BuildInputFromViewModel(institutionData.InstitutionName, institutionData.FromJson()));
+            var superCourses = InstitutionData.Results[institutionData.InstitutionName];
 
-
-            Dictionary<string, CourseProperties> courses = new Dictionary<string, CourseProperties>();
-            foreach (string courseId in viewModel.CourseIds)
+            if (superCourses == null)
             {
-                string key = courseId;
-                Dictionary<int, ScheduledCourseGroupData> courseAlgoResults = results[courseId];
-                if (courseAlgoResults == null)
-                {
-                    return BadRequest();
-                }
-                // setting coursePropety feilds
-                string id = courseId;
-                CourseViewModel course = institutionData.FromJson().CourseList.FirstOrDefault(i => i.Id == id);
-                string name = course.Name;
-
-                Dictionary<string, int> duration = new Dictionary<string, int>();
-                //string lectureDuration = course.Lecture_points / course.Lecture_parts;
-                //duration[]
+                return BadRequest();
             }
+            StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, superCourses);
+
+            algorithm.Run();
+            Dictionary<Period, ScheduledStudentCourseGroupData> result = ParseStudentAlgoOutput(algorithm);
+
+
+            /*SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(InstitutionData.BuildInputFromViewModel(institutionData.InstitutionName, institutionData.FromJson()));
+
+            schedulerAlgorithm.Run();
+
+            StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, schedulerAlgorithm.SuperCourses);
+
+            algorithm.Run();
+
+            Dictionary<Period, ScheduledStudentCourseGroupData> result = ParseStudentAlgoOutput(algorithm);*/
 
             return Ok();
         }
