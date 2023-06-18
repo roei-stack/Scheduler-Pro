@@ -19,7 +19,7 @@ namespace ScheduleForStudent
             Schedule = new Dictionary<Period, (string, int, CourseProperties)>();
         }
 
-        public int Evaluate(StudentDemands demands, List<string> currentCoursesIds)
+        public int Evaluate(StudentDemands demands, IEnumerable<string> currentCoursesIds)
         {
             if (Schedule.Count == 0)
             {

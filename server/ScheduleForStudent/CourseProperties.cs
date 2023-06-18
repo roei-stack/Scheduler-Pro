@@ -50,7 +50,7 @@ namespace ScheduleForStudent
         /// <returns>the group number if found, otherwise -1</returns>
         public int FindGroupByType(string courseType, Period period)
         {
-            if (Groups == null)
+            if (Groups == null || Duration[courseType] == 0)
             {
                 return -1;
             }

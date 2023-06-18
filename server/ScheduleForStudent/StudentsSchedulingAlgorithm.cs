@@ -10,8 +10,8 @@ namespace ScheduleForStudent
     public class StudentsSchedulingAlgorithm
     {
         public StudentDemands Demands { get; set; }
-        private Dictionary<string, CourseProperties>? Courses;
-        private Dictionary<Course, CourseScheduling>? SuperCourses;
+        private Dictionary<string, CourseProperties> Courses;
+        private Dictionary<Course, CourseScheduling> SuperCourses;
         public StudentScheduling ProStudentScheduling { get; set; }
         private List<Period> unoverlapablePeriods;
         /// <summary>
@@ -20,9 +20,10 @@ namespace ScheduleForStudent
         private Dictionary<string, string> semesterTable;
         private Dictionary<string, int> progressTable;
         private bool fromInstutution;
+        private HashSet<string> currentCoursesIds;
 
         public StudentsSchedulingAlgorithm(StudentDemands demands,
-                 Dictionary<Course, CourseScheduling>? superCourses)
+                 Dictionary<Course, CourseScheduling> superCourses)
         {
             Demands = demands;
             SuperCourses = superCourses;
@@ -30,6 +31,10 @@ namespace ScheduleForStudent
             unoverlapablePeriods = new List<Period>();
             progressTable = new Dictionary<string, int>();
             semesterTable = new Dictionary<string, string>();
+            foreach (Course course in superCourses.Keys)
+            {
+                progressTable[course.CourseId] = 0;
+            }
             fromInstutution = true;
         }
 
@@ -56,16 +61,12 @@ namespace ScheduleForStudent
                 ScheduleFromInstutution();
                 return;
             }
-            ScheduleClasses(true);
-            ScheduleClasses(false);
-            FindRemaningExercises(true);
-            FindRemaningExercises(false);
+            CompleteRemainingCourses(ProStudentScheduling);
         }
 
         private void ScheduleFromInstutution()
         {
-            List<string> currentCoursesIds;
-            List<string> bestCurrentCoursesIds = new();
+            HashSet<string> bestCurrentCoursesIds = new();
             int groupNumber = 1;
             bool existGroupNumber = true;
             StudentScheduling helpScheduling;
@@ -83,6 +84,7 @@ namespace ScheduleForStudent
                     existGroupNumber = true;
                     ScheduleCourseGroupFromInstitution(course, groupNumber, helpScheduling);
                     ScheduleCourseGroupFromInstitution(course, groupNumber + course.tLo, helpScheduling);
+                    currentCoursesIds.Add(course.CourseId);
                 }
                 CompleteRemainingCourses(helpScheduling);
                 groupNumber++;
@@ -110,6 +112,9 @@ namespace ScheduleForStudent
             }
             (string, int, CourseProperties) input = (classType, groupNumber,
                             new CourseProperties(course));
+            unoverlapablePeriods.AddRange(SuperCourses[course]
+                .CourseGroups[groupNumber].Item2);
+
             foreach (Period period in SuperCourses[course]
                 .CourseGroups[groupNumber].Item2)
             {
@@ -124,22 +129,25 @@ namespace ScheduleForStudent
 
         private void CompleteRemainingCourses(StudentScheduling helpScheduling)
         {
-
+            ScheduleClasses(true, helpScheduling);
+            ScheduleClasses(false, helpScheduling);
+            FindRemaningExercises(true, helpScheduling);
+            FindRemaningExercises(false, helpScheduling);
         }
 
-        private void ScheduleClasses(bool studentImportant)
+        private void ScheduleClasses(bool studentImportant, StudentScheduling SS)
         {
             foreach (string semester in Demands.WantedSemesters)
             {
                 foreach (Period period in Constants.AvailablePeriods.Where(
                     period => (period.Semester == semester)))
                 {
-                    FindLectures(period, studentImportant);
+                    FindLectures(period, studentImportant, SS);
                 }
             }
         }
 
-        private void FindRemaningExercises(bool studentImportant)
+        private void FindRemaningExercises(bool studentImportant, StudentScheduling SS)
         {
             int groupNumber;
             foreach (string semester in Demands.WantedSemesters)
@@ -148,7 +156,8 @@ namespace ScheduleForStudent
                     period => (period.Semester == semester)))
                 {
                     foreach (string courseID in Demands.WantedCourses.Where(id =>
-                            (progressTable[id] == 1 && semesterTable[id] == semester)))
+                            (progressTable[id] == 1 && semesterTable[id] == semester
+                            && Courses[id].Duration[Constants.Exercise] != 0)))
                     {
                         groupNumber = Courses[courseID].
                             FindGroupByType(Constants.Exercise, period);
@@ -161,13 +170,13 @@ namespace ScheduleForStudent
                         {
                             continue;
                         }
-                        Schedule(courseID, groupNumber, Constants.Exercise);
+                        Schedule(courseID, groupNumber, Constants.Exercise, SS);
                     }
                 }
             }
         }
 
-        private bool FindLectures(Period period, bool studentImportant)
+        private bool FindLectures(Period period, bool studentImportant, StudentScheduling SS)
         {
             if (studentImportant && period.IsPeriodOverlap(Demands.UnavailableTimes))
             {
@@ -178,7 +187,7 @@ namespace ScheduleForStudent
             Period taPeriod;
             // try to get lecture then exercise first
             foreach (string courseID in Demands.WantedCourses.Where(id =>
-                                    (progressTable[id] == 0)))
+                             (progressTable[id] == 0) && !currentCoursesIds.Contains(id)))
             {
                 groupNumber = Courses[courseID].FindGroupByType(Constants.Lecture, period);
                 if (groupNumber == -1)
@@ -190,7 +199,7 @@ namespace ScheduleForStudent
                 {
                     continue;
                 }
-                Schedule(courseID, groupNumber, Constants.Lecture);
+                Schedule(courseID, groupNumber, Constants.Lecture, SS);
 
                 // find ta
                 taPeriod = Constants.AvailablePeriodsFromPeriod[(period.Day, period.Semester,
@@ -205,16 +214,19 @@ namespace ScheduleForStudent
                 {
                     return true;
                 }
-                Schedule(courseID, taGroupNumber, Constants.Exercise);
+                Schedule(courseID, taGroupNumber, Constants.Exercise, SS);
                 return true;
             }
             return false;
         }
 
-        private void Schedule(string courseId, int groupNumber, string classType)
+        private void Schedule(string courseId, int groupNumber, string classType,
+            StudentScheduling SS)
         {
             unoverlapablePeriods.AddRange(Courses[courseId].
                 Groups[classType][groupNumber]);
+
+            currentCoursesIds.Add(courseId);
 
             progressTable[courseId]++;
             semesterTable[courseId] = Courses[courseId].
@@ -228,7 +240,7 @@ namespace ScheduleForStudent
                 {
                     per = Constants.AvailablePeriodsFromPeriod
                                     [(period.Day, period.Semester, hour)];
-                    ProStudentScheduling.Schedule[per] = input;
+                    SS.Schedule[per] = input;
                 }
             }
 
