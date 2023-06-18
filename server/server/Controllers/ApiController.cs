@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Text.Json;
 using CourseModel;
 using System.Collections.Generic;
+using ScheduleForStudent;
 /*
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -107,6 +108,7 @@ namespace server.Controllers
             }
         }
 
+        // institution area
         [Authorize]
         [HttpPost("Account/checkInstitutionName")]
         public async Task<IActionResult> CheckInstitutionName([FromBody] string name)
@@ -356,6 +358,8 @@ namespace server.Controllers
                 {
                     return StatusCode(500);
                 }
+                institutionData.SetResults(coursesScheduled);
+
             } catch (Exception)
             {
                 return StatusCode(500);
@@ -374,6 +378,155 @@ namespace server.Controllers
 
             await dbContext.SaveChangesAsync();
             return Ok( new {output = coursesScheduled, isSuccessful = isSuccessful});
+        }
+
+        // Student area
+        [Authorize]
+        [HttpGet("Account/schedulesList")]
+        public async Task<IActionResult> GetSchedulesList()
+        {
+            // check that user exists as a normal user
+            var username = User.FindFirst("username")?.Value;
+            var user = await dbContext.Users.FindAsync(username);
+
+            if (user == null || user.IsInstitution == true)
+            {
+                return Unauthorized();
+            }
+
+            // todo...
+            List<string> lst = new List<string>();
+
+            return Ok(new { schedules = lst });
+        }
+
+        // With Institution
+        [Authorize]
+        [HttpPost("Account/studentInputWithInstitution")]
+        public IActionResult StudentInputWithInstitution(StudentInputWithInstitutionViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // check that user exists as a normal user
+            var username = User.FindFirst("username")?.Value;
+            var user = dbContext.Users.Find(username);
+            if (user == null || user.IsInstitution == true)
+            {
+                return Unauthorized();
+            }
+
+            // search the institution:
+            InstitutionData institutionData = dbContext.InstitutionsData.FirstOrDefault(i => i.InstitutionName == viewModel.InstitutionName);
+            if (institutionData == null)
+            {
+                return BadRequest();
+            }
+
+            var results = institutionData.GetResults();
+
+            if (results == null)
+            {
+                return BadRequest();
+            }
+
+            // build input:
+            List<string> wantedSemesters = new List<string>();
+            if (viewModel.SemesterA)
+            {
+                wantedSemesters.Add("a");
+            }
+            if (viewModel.SemesterB)
+            {
+                wantedSemesters.Add("b");
+            }
+            if (viewModel.SemesterSummer)
+            {
+                wantedSemesters.Add("summer");
+            }
+
+            StudentDemands demands = new StudentDemands(viewModel.UnavilableTimes, viewModel.CourseIds, viewModel.LearningDays, viewModel.HoursPerDay, wantedSemesters);
+
+            SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(InstitutionData.BuildInputFromViewModel(institutionData.InstitutionName, institutionData.FromJson()));
+
+
+            Dictionary<string, CourseProperties> courses = new Dictionary<string, CourseProperties>();
+            foreach (string courseId in viewModel.CourseIds)
+            {
+                string key = courseId;
+                Dictionary<int, ScheduledCourseGroupData> courseAlgoResults = results[courseId];
+                if (courseAlgoResults == null)
+                {
+                    return BadRequest();
+                }
+                // setting coursePropety feilds
+                string id = courseId;
+                CourseViewModel course = institutionData.FromJson().CourseList.FirstOrDefault(i => i.Id == id);
+                string name = course.Name;
+
+                Dictionary<string, int> duration = new Dictionary<string, int>();
+                //string lectureDuration = course.Lecture_points / course.Lecture_parts;
+                //duration[]
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("Account/finishedInstitutionNames")]
+        public IActionResult finishedInstitutionNames() 
+        {
+            List<string> names = new List<string>();
+
+            foreach(InstitutionData institutionData in dbContext.InstitutionsData)
+            {
+                names.Add(institutionData.InstitutionName);
+            }
+
+            return Ok(new { names });
+        }
+
+        private Dictionary<Period, ScheduledStudentCourseGroupData> ParseStudentAlgoOutput(StudentsSchedulingAlgorithm algorithm)
+        {
+            var schedules = algorithm.ProStudentScheduling.Schedule;
+            var parsedData = new Dictionary<Period, ScheduledStudentCourseGroupData>();
+            ScheduledStudentCourseGroupData defaultParsedData = new ScheduledStudentCourseGroupData { isEmpty = true };
+            ScheduledStudentCourseGroupData groupedCourseData = defaultParsedData;
+            foreach (Period periodKey in Constants.AvailablePeriods)
+            {
+                bool found = false;
+                foreach (KeyValuePair<Period, (string, int, CourseProperties)> kvp in schedules)
+                {
+                    var coursePeriod = kvp.Key;
+                    if (coursePeriod.Day == periodKey.Day &&
+                        coursePeriod.Semester == periodKey.Semester &&
+                        coursePeriod.StartTime <= periodKey.StartTime &&
+                        coursePeriod.EndTime >= periodKey.EndTime)
+                    {
+                        groupedCourseData = new ScheduledStudentCourseGroupData
+                        {
+                            isEmpty = false,
+                            courseId = kvp.Value.Item3.ID,
+                            courseName = kvp.Value.Item3.Name,
+                            groupNumber = kvp.Value.Item2,
+                            lessonType = kvp.Value.Item1
+                        };
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    parsedData[periodKey] = groupedCourseData;
+                }
+                else
+                {
+                    parsedData[periodKey] = defaultParsedData;
+                }
+            }
+            return parsedData;
         }
 
         private Dictionary<string, Dictionary<int, ScheduledCourseGroupData>> BuildInstitutionOutput(SchedulerAlgorithm schedulerAlgorithm)

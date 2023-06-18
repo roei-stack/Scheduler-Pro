@@ -22,6 +22,20 @@ namespace server.Models
 
         public string? SetupViewModelJson { get; set; }
 
+        public string? ResultJson { get; set; }
+
+        public Dictionary<string, Dictionary<int, ScheduledCourseGroupData>>? GetResults()
+        {
+            if (ResultJson == null) return null;
+            return JsonSerializer.Deserialize<Dictionary<string, Dictionary<int, ScheduledCourseGroupData>>>(ResultJson);
+        }
+
+        public void SetResults(Dictionary<string, Dictionary<int, ScheduledCourseGroupData>>? results)
+        {
+            if (results == null) return;
+            this.ResultJson = JsonSerializer.Serialize(results);
+        }
+
         public InstitutionSetupViewModel? FromJson()
         {
             return JsonSerializer.Deserialize<InstitutionSetupViewModel>(SetupViewModelJson);

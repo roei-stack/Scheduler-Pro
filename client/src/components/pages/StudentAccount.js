@@ -5,9 +5,12 @@ import './Pages.css';
 import './Account.css';
 import { AuthContext, SERVER, notifyError } from '../../AuthContextProvider';
 import ScheduleTable from './ScheduleTable';
+import StudentUserForm from '../forms/StudentUserForm';
 
 function Account() {
   const { token } = useContext(AuthContext);
+  const [schedules, setSchedules] = useState([]);
+  const [showForm, setShowFrom] = useState(false);
 
   const isMountedRef = useRef(false);
   useEffect(() => {
@@ -15,11 +18,11 @@ function Account() {
       isMountedRef.current = true;
       return;
     }
-    //fetchScheduels()
+    fetchScheduels()
   }, []);
 
   const fetchScheduels = () => {
-    fetch(`${SERVER}/Account/schedualList`, {
+    fetch(`${SERVER}/Account/schedulesList`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -31,18 +34,21 @@ function Account() {
       } else {
         throw new Error(`An error occured (${response.status})`);
       }
-    }).then(data => {
-
-    }).catch(error => notifyError(error.message));
+    }).then(data => setSchedules(data.schedules))
+      .catch(error => notifyError(error.message));
   };
 
+  const isEmptySchedules = () => schedules.length === 0;
+
   return (
+    <>{showForm? <StudentUserForm onAbort={() => setShowFrom(false)}/> :
     <section className='account'>
       <nav className="side-menu">
         <div className='side-menu-title'>
-          <h1>Your schedules</h1>
-          <Button buttonStyle='btn--outline'><i class="fa-solid fa-plus"></i>&nbsp;New</Button>
+          <h1>{isEmptySchedules() ? 'No schedules found' : 'Your schedules'}</h1>
+          <Button onClick={() => setShowFrom(true)} buttonStyle='btn--outline'><i class="fa-solid fa-plus"></i>&nbsp;New</Button>
         </div>
+        {!isEmptySchedules() && 
         <ul>
           {[...Array(3)].map((item) => (
             <li key={item} className='side-menu-item'>
@@ -52,12 +58,12 @@ function Account() {
               </Link>
             </li>
           ))}
-        </ul>
+        </ul>}
       </nav>
       <div className='right-side'>
-        <ScheduleTable />
+        {isEmptySchedules() ? <>Click "New" to create a new schedual</> : <ScheduleTable />}
       </div>
-    </section >
+    </section >}</>
   );
 }
 
