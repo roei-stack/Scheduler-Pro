@@ -450,22 +450,99 @@ namespace server.Controllers
                 return BadRequest();
             }
             StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, superCourses);
-
             algorithm.Run();
             Dictionary<Period, ScheduledStudentCourseGroupData> result = ParseStudentAlgoOutput(algorithm);
+            return Ok(new {result = result});
+        }
 
+        [Authorize]
+        [HttpPost("Account/studentInputWithoutInstitution")]
+        public IActionResult StudentInputWithoutInstitution(StudentInputWithoutInstitution viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            /*SchedulerAlgorithm schedulerAlgorithm = new SchedulerAlgorithm(InstitutionData.BuildInputFromViewModel(institutionData.InstitutionName, institutionData.FromJson()));
+            // check that user exists as a normal user
+            var username = User.FindFirst("username")?.Value;
+            var user = dbContext.Users.Find(username);
+            if (user == null || user.IsInstitution == true)
+            {
+                return Unauthorized();
+            }
 
-            schedulerAlgorithm.Run();
+            // StudentDemands demands,
+            // Dictionary<string, CourseProperties> courses
 
-            StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, schedulerAlgorithm.SuperCourses);
+            List<string> wantedCourses = viewModel.CoursesData.Select(c => c.Id).ToList();
 
-            algorithm.Run();
+            List<string> wantedSemesters = new List<string>();
+            if (viewModel.SemesterA)
+            {
+                wantedSemesters.Add("a");
+            }
+            if (viewModel.SemesterB)
+            {
+                wantedSemesters.Add("b");
+            }
+            if (viewModel.SemesterSummer)
+            {
+                wantedSemesters.Add("summer");
+            }
 
-            Dictionary<Period, ScheduledStudentCourseGroupData> result = ParseStudentAlgoOutput(algorithm);*/
+            StudentDemands demands = new StudentDemands(viewModel.UnavilableTimes, wantedCourses, viewModel.LearningDays, viewModel.HoursPerDay, wantedSemesters);
 
-            return Ok();
+            Dictionary<string, CourseProperties> courses = new Dictionary<string, CourseProperties>();
+
+            foreach (CourseDataViewModel courseVM in viewModel.CoursesData)
+            {
+                string key = courseVM.Id;
+
+                // course propeties
+                string name = courseVM.Name;
+                string id = courseVM.Id;
+
+                // groups
+                Dictionary<string, Dictionary<int, List<Period>>> groups = new Dictionary<string, Dictionary<int, List<Period>>>();
+                Dictionary<int, List<Period>> lectureGroups = new Dictionary<int, List<Period>>();
+                Dictionary<int, List<Period>> exreciseGroups = new Dictionary<int, List<Period>>();
+
+                int i = 0;
+                foreach (Period period in courseVM.LectureTimes)
+                {
+                    int groupNumber = i;
+                    List<Period> value = new List<Period> { period };
+                    lectureGroups[groupNumber] = value;
+                    i++;
+                }
+
+                i = 0;
+                foreach (Period period in courseVM.ExreciseTimes)
+                {
+                    int groupNumber = i;
+                    List<Period> value = new List<Period> { period };
+                    exreciseGroups[groupNumber] = value;
+                    i++;
+                }
+                groups[Constants.Lecture] = lectureGroups;
+                groups[Constants.Exercise] = exreciseGroups;
+
+                courses[key] = new CourseProperties(name, id, groups, courseVM.LectureDuration, courseVM.ExreciseDuration);
+            }
+
+            Dictionary<Period, ScheduledStudentCourseGroupData> result;
+            try
+            {
+                StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, courses);
+                algorithm.Run();
+                result = ParseStudentAlgoOutput(algorithm);
+            } catch (Exception)
+            {
+                return BadRequest();
+            }
+           
+            return Ok(new {result = result});
         }
 
         [Authorize]

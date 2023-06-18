@@ -89,17 +89,6 @@ function StudentUserForm({ onAbort }) {
         const unavilableTimesFinal = unavilableTimes.map(({ index, ...item }) => item);
 
         if (selectedInstitution != '') {
-            console.log({
-                name: name,
-                institutionName: selectedInstitution,
-                learningDays: learningDays,
-                hoursPerDay: hoursPerDay,
-                semesterA: semesterA,
-                semesterB: semesterB,
-                semesterSummer: semesterSummer,
-                unavilableTimes: unavilableTimesFinal,
-                courseIds: courseIdsList
-            })
             // send course id's list
             fetch(`${SERVER}/Account/studentInputWithInstitution`, {
                 method: 'POST',
