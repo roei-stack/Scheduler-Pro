@@ -1,0 +1,3 @@
+LoneUniStaff
+1,John Doe,{ENG101: {Lecturer: 2}; MATH101: {Lecturer: 2}}
+2,Jane Smith,{ENG101: {TA: 4} ; MATH101: {TA: 2}}

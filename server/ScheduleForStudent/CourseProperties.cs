@@ -36,10 +36,21 @@ namespace ScheduleForStudent
             };
         }
 
+        public CourseProperties(CourseScheduling courseScheduling)
+        {
+            Name = courseScheduling.Course.CourseName;
+            ID = courseScheduling.Course.CourseId;
+        }
+        public CourseProperties(Course course)
+        {
+            Name = course.CourseName;
+            ID = course.CourseId;
+        }
+
         /// <returns>the group number if found, otherwise -1</returns>
         public int FindGroupByType(string courseType, Period period)
         {
-            if (Groups == null)
+            if (Groups == null || Duration[courseType] == 0)
             {
                 return -1;
             }
