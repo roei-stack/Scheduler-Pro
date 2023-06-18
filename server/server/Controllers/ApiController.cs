@@ -395,10 +395,15 @@ namespace server.Controllers
                 return Unauthorized();
             }
 
-            // todo...
-            List<string> lst = new List<string>();
+            List<StudentAlgoResult> lst = dbContext.StudentAlgoResults.Where(r => r.Username == username).ToList();
 
-            return Ok(new { schedules = lst });
+            List<StudentScheduleItem> schedules = lst.Select(r => new StudentScheduleItem
+            {
+                Name = r.Name,
+                Schedule = r.GetListResult(),
+            }).ToList();
+
+            return Ok(new { schedules = schedules });
         }
 
         // With Institution
@@ -452,7 +457,24 @@ namespace server.Controllers
             StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, superCourses);
             algorithm.Run();
             Dictionary<Period, ScheduledStudentCourseGroupData> result = ParseStudentAlgoOutput(algorithm);
-            return Ok(new {result = result});
+
+            List<StudentAlgorithmResultItemViewModel> listResult = result.Select(kv => new StudentAlgorithmResultItemViewModel
+            {
+                HourPeriod = kv.Key,
+                GroupData = kv.Value
+            }).ToList();
+
+            StudentAlgoResult studentAlgoResult = new StudentAlgoResult
+            {
+                Id = username + "&" + viewModel.Name,
+                Name = viewModel.Name,
+                Username = username,
+            };
+            studentAlgoResult.SetListResult(listResult);
+            dbContext.StudentAlgoResults.Add(studentAlgoResult);
+            dbContext.SaveChanges();
+
+            return Ok(new {result = listResult, name = viewModel.Name });
         }
 
         [Authorize]
@@ -531,18 +553,33 @@ namespace server.Controllers
                 courses[key] = new CourseProperties(name, id, groups, courseVM.LectureDuration, courseVM.ExreciseDuration);
             }
 
-            Dictionary<Period, ScheduledStudentCourseGroupData> result;
+            List<StudentAlgorithmResultItemViewModel> listResult;
             try
             {
                 StudentsSchedulingAlgorithm algorithm = new StudentsSchedulingAlgorithm(demands, courses);
                 algorithm.Run();
-                result = ParseStudentAlgoOutput(algorithm);
+                Dictionary<Period, ScheduledStudentCourseGroupData>  result = ParseStudentAlgoOutput(algorithm);
+                listResult = result.Select(kv => new StudentAlgorithmResultItemViewModel
+                {
+                    HourPeriod = kv.Key,
+                    GroupData = kv.Value
+                }).ToList();
             } catch (Exception)
             {
                 return BadRequest();
             }
-           
-            return Ok(new {result = result});
+
+            StudentAlgoResult studentAlgoResult = new StudentAlgoResult
+            {
+                Id = username + "&" + viewModel.Name,
+                Name = viewModel.Name,
+                Username = username,
+            };
+            studentAlgoResult.SetListResult(listResult);
+            dbContext.StudentAlgoResults.Add(studentAlgoResult);
+            dbContext.SaveChanges();
+
+            return Ok(new {result = listResult, name = viewModel.Name });
         }
 
         [Authorize]
@@ -563,7 +600,14 @@ namespace server.Controllers
         {
             var schedules = algorithm.ProStudentScheduling.Schedule;
             var parsedData = new Dictionary<Period, ScheduledStudentCourseGroupData>();
-            ScheduledStudentCourseGroupData defaultParsedData = new ScheduledStudentCourseGroupData { isEmpty = true };
+            ScheduledStudentCourseGroupData defaultParsedData = new ScheduledStudentCourseGroupData 
+            {
+                IsEmpty = true,
+                CourseId = "-1",
+                CourseName = "-1",
+                GroupNumber = -1,
+                LessonType = "-1"
+            };
             ScheduledStudentCourseGroupData groupedCourseData = defaultParsedData;
             foreach (Period periodKey in Constants.AvailablePeriods)
             {
@@ -578,11 +622,11 @@ namespace server.Controllers
                     {
                         groupedCourseData = new ScheduledStudentCourseGroupData
                         {
-                            isEmpty = false,
-                            courseId = kvp.Value.Item3.ID,
-                            courseName = kvp.Value.Item3.Name,
-                            groupNumber = kvp.Value.Item2,
-                            lessonType = kvp.Value.Item1
+                            IsEmpty = false,
+                            CourseId = kvp.Value.Item3.ID,
+                            CourseName = kvp.Value.Item3.Name,
+                            GroupNumber = kvp.Value.Item2,
+                            LessonType = kvp.Value.Item1
                         };
                         found = true;
                         break;

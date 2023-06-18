@@ -6,7 +6,7 @@ import { daysOfWeekOptions } from '../../AuthContextProvider';
 import FileUpload from '../FileUpload';
 import TimesInput from './TimesInput';
 
-function StudentUserForm({ onAbort }) {
+function StudentUserForm({ onAbort = () => {}, onSuccess = () => {} }) {
     const { token } = useContext(AuthContext);
     const [institutionNames, setInstitutionNames] = useState([]);
     const [selectedInstitution, setSelectedInstitution] = useState('');
@@ -113,7 +113,9 @@ function StudentUserForm({ onAbort }) {
                 } else {
                     throw new Error('Something went wrong');
                 }
-            }).then(data => console.log(data))
+            }).then(data => {
+                onSuccess(data);
+            })
                 .catch(error => notifyError(error.message));
         } else {
             // send full courses
@@ -124,6 +126,7 @@ function StudentUserForm({ onAbort }) {
                 coursesData[index].lectureTimes = filteredLectureTimes;
                 coursesData[index].exreciseTimes = filteredExreciseTimes;
             }
+            console.log('here');
             fetch(`${SERVER}/Account/studentInputWithoutInstitution`, {
                 method: 'POST',
                 headers: {
@@ -146,7 +149,10 @@ function StudentUserForm({ onAbort }) {
                 } else {
                     throw new Error('Something went wrong');
                 }
-            }).then(data => console.log(data))
+            }).then(data => {
+                console.log(data);
+                onSuccess(data);
+            })
                 .catch(error => notifyError(error.message));
         }
     }

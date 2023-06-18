@@ -1,14 +1,15 @@
 ﻿namespace server.Models
 {
+    [Serializable]
     public class ScheduledStudentCourseGroupData
     {
-        public string? lessonType { get; set; }
+        public string? LessonType { get; set; }
 
-        public int groupNumber { get; set; }
+        public int GroupNumber { get; set; }
 
-        public string? courseName { get; set; }
-        public string? courseId { get; set; }
+        public string? CourseName { get; set; }
+        public string? CourseId { get; set; }
 
-        public bool isEmpty { get; set; }
+        public bool IsEmpty { get; set; }
     }
 }
