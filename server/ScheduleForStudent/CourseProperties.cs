@@ -40,6 +40,23 @@ namespace ScheduleForStudent
         {
             Name = courseScheduling.Course.CourseName;
             ID = courseScheduling.Course.CourseId;
+            Duration = new Dictionary<string, int>
+            {
+                [Constants.Lecture] = courseScheduling.Course.LecturePoints
+                                     / courseScheduling.Course.LectureParts,
+                [Constants.Exercise] = courseScheduling.Course.TAPoints
+            };
+            Groups = new Dictionary<string, Dictionary<int, List<Period>>>();
+            Groups[Constants.Lecture] = new Dictionary<int, List<Period>>();
+            Groups[Constants.Exercise] = new Dictionary<int, List<Period>>();
+            for (int i = 1; i <= courseScheduling.Course.tLo; i++) {
+                Groups[Constants.Lecture][i] = courseScheduling.CourseGroups[i].Item2;
+            }
+            for (int i = courseScheduling.Course.tLo + 1;
+                i <= courseScheduling.Course.tLo + courseScheduling.Course.tTAo; i++)
+            {
+                Groups[Constants.Lecture][i] = courseScheduling.CourseGroups[i].Item2;
+            }
         }
         public CourseProperties(Course course)
         {

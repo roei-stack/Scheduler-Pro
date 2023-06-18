@@ -36,6 +36,14 @@ namespace ScheduleForStudent
                 progressTable[course.CourseId] = 0;
             }
             fromInstutution = true;
+
+            Courses = new Dictionary<string, CourseProperties>();
+            CourseProperties courseProperties ;
+            foreach (Course course in SuperCourses.Keys)
+            {
+                courseProperties = new CourseProperties(SuperCourses[course]);
+                Courses[course.CourseId] = courseProperties;
+            }
         }
 
         public StudentsSchedulingAlgorithm(StudentDemands demands,
