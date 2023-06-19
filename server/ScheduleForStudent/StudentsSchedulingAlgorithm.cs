@@ -60,6 +60,7 @@ namespace ScheduleForStudent
             {
                 progressTable[courseId] = 0;
             }
+            currentCoursesIds = new HashSet<string>();
         }
 
         public void Run()
